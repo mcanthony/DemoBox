@@ -6,7 +6,7 @@
 	window.f = function(){};
 
 	var W, H, HW, HH;
-	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\nfunction f(t) { return Math.sin(t*0.1); }";
+	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\nfunction f(t) { return 0.5 * Math.sin(880 * Math.PI * t); }";
 	var allowed = ["Math", "r"];
 
 	// Settings
