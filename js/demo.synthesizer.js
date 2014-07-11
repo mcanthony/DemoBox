@@ -76,7 +76,7 @@
 
 		reset: function() {
 			t = 0;
-			$time.innerHTML = (t/sampleRate).toFixed(2);
+			$time.innerHTML = "0.00";
 			Demo.Synthesizer.togglePlayback(false);
 		},
 

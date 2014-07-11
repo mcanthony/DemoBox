@@ -2,7 +2,7 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var gl, bfr, aPos, iGlobalTime, iResolution, request, timer, t = 0;
+	var gl, bfr, aPos, iGlobalTime, iResolution, request, startTime = performance.now(), timer, t = 0;
 
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;\n"
@@ -35,7 +35,7 @@
 		render: function(time) {
 
 			request = !Demo.Shader.stop && window.requestAnimationFrame(Demo.Shader.render);
-			t = time;
+			t = time - startTime;
 
 			gl.uniform1f(iGlobalTime, time/1000);
 			gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
@@ -87,6 +87,8 @@
 		},
 
 		reset: function() {
+			$time.innerHTML = "0.00";
+			startTime = performance.now();
 			Demo.Shader.togglePlayback(false);
 		},
 
