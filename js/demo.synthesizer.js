@@ -98,6 +98,7 @@
 
 		parseCode: function(e) {
 
+			window.onerror = Demo.Synthesizer.error;
 			$code.className = "";
 
 			var $script = $("#script");
@@ -109,6 +110,7 @@
 
 			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
 			document.body.appendChild($script);
+			window.onerror = null;
 		},
 
 		canvasSetup: function() {
