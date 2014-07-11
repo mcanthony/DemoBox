@@ -43,6 +43,9 @@
 			Demo.Synthesizer.parseCode();
 			Demo.Synthesizer.canvasSetup();
 
+			node.onaudioprocess = Demo.Synthesizer.process;
+			Demo.Synthesizer.togglePlayback(true);
+
 			// Event-Listeners
 			$run.addEventListener("click", Demo.Synthesizer.parseCode, false);
 			$play.addEventListener("click", Demo.Synthesizer.togglePlayback);
@@ -127,11 +130,10 @@
 			ctx.fillStyle = "#111";
 			ctx.strokeStyle = lineColor;
 			ctx.lineWidth = lineWidth;
-			Demo.Synthesizer.generateThumbnail();
+			//Demo.Synthesizer.generateThumbnail();
 		},
 
 		generateThumbnail: function() {
-			node.onaudioprocess = Demo.Synthesizer.process;
 			node.connect(atx.destination);
 			window.setTimeout(function() { node.disconnect(); }, 10);
 		},
