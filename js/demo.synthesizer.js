@@ -95,7 +95,7 @@
 			else { playing = e && e.target.getAttribute("data-status") == "1"; }
 
 			if (!playing) {
-				timer = window.setInterval(function() { $time.innerHTML = (t/sampleRate).toFixed(2); }, 100);
+				timer = window.setInterval(function() { $time.innerHTML = ((t*(1/increase))/sampleRate).toFixed(2); }, 100);
 				node.connect(atx.destination);
 			} else {
 				window.clearInterval(timer);
