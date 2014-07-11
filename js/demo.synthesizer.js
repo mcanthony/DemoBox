@@ -105,7 +105,7 @@
 
 			$script = document.createElement("script");
 			$script.id = "script";
-			$script.innerHTML = "try{window.f=function(){"+Demo.Synthesizer.XSSPreventer()+"var r="+sampleRate+";"+$code.value+"\n;return f}()}catch(e){Demo.Synthesizer.error(e)}";
+			$script.innerHTML = "try{window.f=function(r){"+Demo.Synthesizer.XSSPreventer()+$code.value+"\n;return f}("+sampleRate+")}catch(e){Demo.Synthesizer.error(e)}";
 
 			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
 			document.body.appendChild($script);
