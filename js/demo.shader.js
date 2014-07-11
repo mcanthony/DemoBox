@@ -132,11 +132,11 @@
 
 		} else if (e.keyCode === 9) {
 
-			var start = Demo.Shader.selectionStart;
-			var end = Demo.Shader.selectionEnd;
+			var start = $code.selectionStart;
+			var end = $code.selectionEnd;
 
-			Demo.Shader.value = (Demo.Shader.value.substring(0, start) + "\t" + Demo.Shader.value.substring(end));
-			Demo.Shader.selectionStart = Demo.Shader.selectionEnd = start + 1;
+			$code.value = ($code.value.substring(0, start) + "\t" + $code.value.substring(end));
+			$code.selectionStart = Demo.Shader.selectionEnd = start + 1;
 			e.preventDefault();
 		}
 	}, false);

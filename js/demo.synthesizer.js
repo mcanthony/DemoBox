@@ -159,10 +159,10 @@
 
 		} else if (e.keyCode === 9) {
 
-			var start = Demo.Synthesizer.selectionStart;
-			var end = Demo.Synthesizer.selectionEnd;
-			Demo.Synthesizer.value = (Demo.Synthesizer.value.substring(0, start) + "\t" + Demo.Synthesizer.value.substring(end));
-			Demo.Synthesizer.selectionStart = Demo.Synthesizer.selectionEnd = start + 1;
+			var start = $code.selectionStart;
+			var end = $code.selectionEnd;
+			$code.value = ($code.value.substring(0, start) + "\t" + $code.value.substring(end));
+			$code.selectionStart = $code.selectionEnd = start + 1;
 			e.preventDefault();
 		}
 	}, false);
