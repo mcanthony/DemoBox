@@ -3,7 +3,11 @@
 	function $(str) { return document.querySelector(str); }
 
 	window.t = 0;
+	window.f = function(){};
+
+	var W, H, HW, HH;
 	var example = "/**\n * Synthesizer (Javascript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample\n * int      r // sample rate\n */\n\nfunction f() { return Math.sin(t*0.1); }";
+	var allowed = ["Math", "t", "r"];
 
 	// Settings
 	var bufferSize = 512;
@@ -14,18 +18,15 @@
 	// Interfaces
 	var ctx = $(".synthesizer canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
-	var node = atx.createScriptProcessor(bufferSize,1,1);
+	var node = atx.createScriptProcessor(bufferSize,1,2);
 	
 	// HTML-Elements
 	var $view = $(".synthesizer td");
 	var $code = $(".synthesizer textarea");
-
 	var $play = $(".synthesizer .play-pause");
 	var $reset = $(".synthesizer .reset");
 	var $run = $(".synthesizer .run");
 	var $time = $(".synthesizer .time");
-
-	var W, H, HW, HH;
 
 	Demo.Synthesizer = {
 
@@ -98,12 +99,15 @@
 		},
 
 		parseCode: function(e) {
+
+			$code.className = "";
+
 			var $script = $("#script");
 			if ($script) { $script.remove(); }
 
 			$script = document.createElement("script");
 			$script.id = "script";
-			$script.innerHTML = $code.value;
+			$script.innerHTML = "try{window.f=function(){"+Demo.Synthesizer.XSSPreventer()+$code.value+"\n;return f}()}catch(e){Demo.Synthesizer.error(e)}";
 
 			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
 			document.body.appendChild($script);
@@ -125,6 +129,22 @@
 			node.onaudioprocess = Demo.Synthesizer.process;
 			node.connect(atx.destination);
 			window.setTimeout(function() { node.disconnect(); }, 10);
+		},
+
+		XSSPreventer: function() {
+			var keys = [];
+			
+			for (var key in window) {
+				if(!~allowed.indexOf(key)) {
+					keys.push(key);
+				}
+			}
+
+			return "var " + keys.join(",") + ";"
+		},
+
+		error: function(e) {
+			$code.className = "error";
 		}
 	};
 

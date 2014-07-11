@@ -34,7 +34,7 @@
 
 		render: function(time) {
 
-			if (gl.getError()) { return window.cancelAnimationFrame(request); }
+			if (gl.getError()) { Demo.Shader.error(); return window.cancelAnimationFrame(request); }
 			request = !Demo.Shader.stop && window.requestAnimationFrame(Demo.Shader.render);
 
 			$time.innerHTML = (time/1000).toFixed(2);
@@ -45,6 +45,8 @@
 
 		compile: function(e) {
 
+			$code.className = "";
+			
 			if (e) { window.location.hash = btoa($code.value) + ";" + btoa($(".synthesizer textarea").value); }
 			window.cancelAnimationFrame(request);
 
@@ -109,6 +111,10 @@
 
 			gl.uniform2f(iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+		},
+
+		error: function(e) {
+			$code.className = "error";
 		}
 	};
 

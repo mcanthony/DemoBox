@@ -107,6 +107,10 @@ textarea {
 	resize: none;
 }
 
+textarea.error {
+	box-shadow: inset 0px 0px 0px 2px #F00;
+}
+
 textarea::-webkit-scrollbar {
 	width: 12px;
 	background: #000;
