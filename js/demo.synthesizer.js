@@ -43,6 +43,7 @@
 			$play.addEventListener("click", Demo.Synthesizer.togglePlayback);
 			$reset.addEventListener("click", Demo.Synthesizer.reset);
 
+			window.r = atx.sampleRate;
 			window.addEventListener("resize", Demo.Synthesizer.canvasSetup);
 		},
 
