@@ -12,7 +12,7 @@
 	// Settings
 	var bufferSize = 512;
 	var increase;
-	var waveSize = 10;
+	var waveSize = 100;
 	var lineWidth = 5;
 	var lineColor = "#0F9";
 
@@ -36,6 +36,9 @@
 			var base64 = window.location.hash.substr(1);
 			if (!base64) { $code.value = example; }
 
+			sampleRate = atx.sampleRate;
+			increase = bufferSize/(sampleRate*bufferSize);
+
 			// Play
 			Demo.Synthesizer.parseCode();
 			Demo.Synthesizer.canvasSetup();
@@ -45,8 +48,6 @@
 			$play.addEventListener("click", Demo.Synthesizer.togglePlayback);
 			$reset.addEventListener("click", Demo.Synthesizer.reset);
 
-			sampleRate = atx.sampleRate;
-			increase = bufferSize/(sampleRate*bufferSize);
 			window.addEventListener("resize", Demo.Synthesizer.canvasSetup);
 		},
 
