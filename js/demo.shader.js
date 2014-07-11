@@ -90,7 +90,7 @@
 		reset: function() {
 			$time.innerHTML = "0.00";
 			startTime = performance.now();
-			Demo.Shader.togglePlayback(false);
+			// Demo.Shader.togglePlayback(false);
 		},
 
 		togglePlayback: function(e) {

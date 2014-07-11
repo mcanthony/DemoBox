@@ -78,7 +78,7 @@
 		reset: function() {
 			t = 0;
 			$time.innerHTML = "0.00";
-			Demo.Synthesizer.togglePlayback(false);
+			// Demo.Synthesizer.togglePlayback(false);
 		},
 
 		togglePlayback: function(e) {
