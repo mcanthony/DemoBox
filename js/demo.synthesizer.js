@@ -21,12 +21,12 @@
 	var node = atx.createScriptProcessor(bufferSize,1,2);
 	
 	// HTML-Elements
-	var $view = $(".synthesizer td");
-	var $code = $(".synthesizer textarea");
-	var $play = $(".synthesizer .play-pause");
+	var $view  = $(".synthesizer td");
+	var $code  = $(".synthesizer textarea");
+	var $play  = $(".synthesizer .play-pause");
 	var $reset = $(".synthesizer .reset");
-	var $run = $(".synthesizer .run");
-	var $time = $(".synthesizer .time");
+	var $run   = $(".synthesizer .run");
+	var $time  = $(".synthesizer .time");
 
 	Demo.Synthesizer = {
 
@@ -54,6 +54,7 @@
 
 			for (var i = 0, l = data.length; i < l; i++) {
 				Demo.Synthesizer.display(data[i]=f(t++),i);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,data[i]);
 			}
 		},
 

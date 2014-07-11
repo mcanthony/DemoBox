@@ -2,18 +2,18 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var gl, bfr, aPos, iGlobalTime, iResolution, request, startTime = performance.now(), timer, t = 0;
+	var gl, bfr, aPos, iGlobalTime, iResolution, iSample, request, startTime = performance.now(), timer, t = 0;
 
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
-	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;\n"
+	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;\n"
 	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n */\n\nvoid main()\n{\n\tvec2 uv = gl_FragCoord.xy/iResolution.xy;\n\tgl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
 
-	var $view = $(".shader td");
-	var $code = $(".shader textarea");
-	var $play = $(".shader .play-pause");
+	var $view  = $(".shader td");
+	var $code  = $(".shader textarea");
+	var $play  = $(".shader .play-pause");
 	var $reset = $(".shader .reset");
-	var $run = $(".shader .run");
-	var $time = $(".shader .time");
+	var $run   = $(".shader .run");
+	var $time  = $(".shader .time");
 
 	Demo.Shader = {
 
@@ -72,8 +72,9 @@
 			bfr = gl.createBuffer();
 			aPos = gl.getAttribLocation(program, "aPos");
 
-			iGlobalTime = gl.getUniformLocation(program, "iGlobalTime");
-			iResolution = gl.getUniformLocation(program, "iResolution");
+			Demo.Shader.iGlobalTime = iGlobalTime = gl.getUniformLocation(program, "iGlobalTime");
+			Demo.Shader.iResolution = iResolution = gl.getUniformLocation(program, "iResolution");
+			Demo.Shader.iSample = iSample = gl.getUniformLocation(program, "iSample");
 
 			gl.bindBuffer(gl.ARRAY_BUFFER, bfr);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1.0,-1.0,1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,1.0,-1.0,1.0]), gl.STATIC_DRAW);
@@ -112,7 +113,7 @@
 		},
 
 		canvasSetup: function() {
-			gl = $(".shader canvas").getContext("webgl");
+			Demo.Shader.gl = gl = $(".shader canvas").getContext("webgl");
 			gl.canvas.width = $view.offsetWidth;
 			gl.canvas.height = $view.offsetHeight;
 
