@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Shadertoy</title>
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+	</head>
+	<body>
+		<span id="credits">&copy; 2014 Elias Schütt - <a href="https://github.com/elias94xx/HTML5-Demo-Tool">GitHub Repository</a></span>
+		<table>
+			<tr class="shader">
+				<td><canvas id="shader-canvas"></canvas></td>
+				<td><div class="code-view">
+					<textarea id="shader-code" spellcheck="false"></textarea>
+					<div class="controls">	
+						<span class="run">Compile (ctrl+enter)</span>
+						<span class="play-pause" data-status="1"></span>
+						<span class="reset"></span>
+						<span class="time">00:34</span>
+					</div>
+				</div></div></td>
+			</tr>
+
+			<tr class="synthesizer">
+				<td><canvas id="synthesizer-canvas"></canvas></td>
+				<td><div class="code-view">
+					<textarea id="synthesizer-code" spellcheck="false"></textarea>
+					<div class="controls">
+						<span class="run">Run (ctrl+enter)</span>
+						<span class="play-pause"></span>
+						<span class="reset"></span>
+						<span class="time"></span>
+					</div>
+				</div></div></td>
+			</tr>
+		</table>
+
+		<script src="js/demo.shader.js"></script>
+		<script src="js/demo.synthesizer.js"></script>
+		<script src="js/demo.js"></script>
+	</body>
+</html>
