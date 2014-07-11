@@ -2,11 +2,11 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	window.t = 0;
+	var t = 0;
 	window.f = function(){};
 
 	var W, H, HW, HH;
-	var example = "/**\n * Synthesizer (Javascript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample\n * int      r // sample rate\n */\n\nfunction f() { return Math.sin(t*0.1); }";
+	var example = "/**\n * Synthesizer (Javascript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample\n * int      r // sample rate\n */\n\nfunction f(t) { return Math.sin(t*0.1); }";
 	var allowed = ["Math", "t", "r"];
 
 	// Settings
@@ -38,6 +38,7 @@
 			// Play
 			Demo.Synthesizer.parseCode();
 			Demo.Synthesizer.canvasSetup();
+			Demo.Synthesizer.generateThumbnail();
 
 			// Event-Listeners
 			$run.addEventListener("click", Demo.Synthesizer.parseCode, false);
@@ -50,16 +51,13 @@
 
 		process: function(e) {
 
-			var data = e.outputBuffer.getChannelData(0), sample;
+			var data = e.outputBuffer.getChannelData(0);
 
-			for (var i = 0; i < data.length; ++i) {
-				sample = f();
-				data[i] = sample;
-				Demo.Synthesizer.display(sample,i);
-				window.t++;
+			for (var i = 0, l = data.length; i < l; i++) {
+				Demo.Synthesizer.display(data[i]=f(t++),i);
 			}
 
-			$time.innerHTML = (window.t/data.length).toFixed(2);
+			$time.innerHTML = (t/data.length).toFixed(2);
 		},
 
 		display: function(sample, i) {
@@ -121,8 +119,6 @@
 			ctx.fillStyle = "#111";
 			ctx.strokeStyle = lineColor;
 			ctx.lineWidth = lineWidth;
-
-			Demo.Synthesizer.generateThumbnail();
 		},
 
 		generateThumbnail: function() {
