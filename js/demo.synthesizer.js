@@ -11,6 +11,7 @@
 
 	// Settings
 	var bufferSize = 512;
+	var increase;
 	var waveSize = 10;
 	var lineWidth = 5;
 	var lineColor = "#0F9";
@@ -45,6 +46,7 @@
 			$reset.addEventListener("click", Demo.Synthesizer.reset);
 
 			sampleRate = atx.sampleRate;
+			increase = bufferSize/(sampleRate*bufferSize);
 			window.addEventListener("resize", Demo.Synthesizer.canvasSetup);
 		},
 
@@ -53,7 +55,7 @@
 			var data = e.outputBuffer.getChannelData(0);
 
 			for (var i = 0, l = data.length; i < l; i++) {
-				Demo.Synthesizer.display(data[i]=f(t++),i);
+				Demo.Synthesizer.display(data[i]=f(t+=increase),i);
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,data[i]);
 			}
 		},
