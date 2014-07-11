@@ -37,7 +37,7 @@
 			request = !Demo.Shader.stop && window.requestAnimationFrame(Demo.Shader.render);
 			t = time - startTime;
 
-			gl.uniform1f(iGlobalTime, time/1000);
+			gl.uniform1f(iGlobalTime, t/1000);
 			gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
 		},
