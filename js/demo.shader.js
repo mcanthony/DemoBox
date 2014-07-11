@@ -2,7 +2,7 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var gl, bfr, aPos, iGlobalTime, iResolution, request;
+	var gl, bfr, aPos, iGlobalTime, iResolution, request, timer, t = 0;
 
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;\n"
@@ -24,7 +24,7 @@
 
 			Demo.Shader.canvasSetup();
 			Demo.Shader.compile();
-			Demo.Shader.render();
+			Demo.Shader.togglePlayback(true);
 
 			$run.addEventListener("click", Demo.Shader.compile);
 			$play.addEventListener("click", Demo.Shader.togglePlayback);
@@ -34,10 +34,9 @@
 
 		render: function(time) {
 
-			if (gl.getError()) { Demo.Shader.error(); return window.cancelAnimationFrame(request); }
 			request = !Demo.Shader.stop && window.requestAnimationFrame(Demo.Shader.render);
+			t = time;
 
-			$time.innerHTML = (time/1000).toFixed(2);
 			gl.uniform1f(iGlobalTime, time/1000);
 			gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -46,7 +45,7 @@
 		compile: function(e) {
 
 			$code.className = "";
-			
+
 			if (e) { window.location.hash = btoa($code.value) + ";" + btoa($(".synthesizer textarea").value); }
 			window.cancelAnimationFrame(request);
 
@@ -83,7 +82,8 @@
 			gl.uniform2f(iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-			Demo.Shader.render(0);
+			if (gl.getError()) { Demo.Shader.error(); }
+			else { Demo.Shader.render(0); }
 		},
 
 		reset: function() {
@@ -98,7 +98,12 @@
 
 			Demo.Shader.stop = playing;
 
-			if (!playing) { Demo.Shader.render(0); }
+			if (!playing) {
+				timer = window.setInterval(function() { $time.innerHTML = (t/1000).toFixed(2); }, 100);
+				Demo.Shader.render(0);
+			} else {
+				window.clearInterval(timer);
+			}
 
 			$play.setAttribute("data-status", playing ? "0" : "1");
 			$play.style.backgroundPosition = playing ? "0px 0px" : "-20px 0px";

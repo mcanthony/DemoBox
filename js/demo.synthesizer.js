@@ -2,7 +2,7 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var t = 0, sampleRate;
+	var t = 0, sampleRate, timer;
 	window.f = function(){};
 
 	var W, H, HW, HH;
@@ -55,8 +55,6 @@
 			for (var i = 0, l = data.length; i < l; i++) {
 				Demo.Synthesizer.display(data[i]=f(t++),i);
 			}
-
-			$time.innerHTML = (t/sampleRate).toFixed(2);
 		},
 
 		display: function(sample, i) {
@@ -88,8 +86,13 @@
 			if (typeof e == "boolean") { playing = !e; }
 			else { playing = e && e.target.getAttribute("data-status") == "1"; }
 
-			if (!playing) { node.connect(atx.destination); }
-			else { node.disconnect(); }
+			if (!playing) {
+				timer = window.setInterval(function() { $time.innerHTML = (t/sampleRate).toFixed(2); }, 100);
+				node.connect(atx.destination);
+			} else {
+				window.clearInterval(timer);
+				node.disconnect();
+			}
 
 			$play.setAttribute("data-status", playing ? "0" : "1");
 			$play.style.backgroundPosition = playing ? "0px 0px" : "-20px 0px";
