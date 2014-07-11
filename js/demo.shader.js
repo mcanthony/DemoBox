@@ -45,7 +45,7 @@
 
 		compile: function(e) {
 
-			if (e) { window.location.hash = btoa($code.value); + ";" + btoa($(".synthesizer textarea").value); }
+			if (e) { window.location.hash = btoa($code.value) + ";" + btoa($(".synthesizer textarea").value); }
 			window.cancelAnimationFrame(request);
 
 			var vs = gl.createShader(gl.VERTEX_SHADER);
@@ -116,7 +116,7 @@
 		if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
 
 			e.preventDefault();
-			window.location.hash = btoa($code.value); + ";" + btoa($(".synthesizer textarea").value);
+			window.location.hash = btoa($code.value) + ";" + btoa($(".synthesizer textarea").value);
 			Demo.Shader.compile();
 
 		} else if (e.keyCode === 9) {
