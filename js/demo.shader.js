@@ -1,27 +1,26 @@
 ;(function(Demo, window, undefined) {
 
+	function $(str) { return document.querySelector(str); }
+
 	var gl, bfr, aPos, iGlobalTime, iResolution, request;
 
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;\n"
 	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n */\n\nvoid main()\n{\n\tvec2 uv = gl_FragCoord.xy/iResolution.xy;\n\tgl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
 
-	var $view = document.querySelector(".shader td");
-	var $code = document.querySelector("#shader-code");
-	var $play = document.querySelector(".shader .play-pause");
-	var $reset = document.querySelector(".shader .reset");
-	var $run = document.querySelector(".shader .run");
-	var $time = document.querySelector(".shader .time");
+	var $view = $(".shader td");
+	var $code = $(".shader textarea");
+	var $play = $(".shader .play-pause");
+	var $reset = $(".shader .reset");
+	var $run = $(".shader .run");
+	var $time = $(".shader .time");
 
 	Demo.Shader = {
 
 		init: function() {
 
-			$code.value = fsc;
-			start = new Date().getTime();
-
-			//base64 = location.hash.substr(1);
-			//if (base64) { $code.value = atob(base64); }
+			var base64 = window.location.hash.substr(1);
+			if (!base64) { $code.value = fsc; }
 
 			Demo.Shader.canvasSetup();
 			Demo.Shader.compile();
@@ -44,8 +43,9 @@
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
 		},
 
-		compile: function() {
+		compile: function(e) {
 
+			if (e) { window.location.hash = btoa($code.value); + ";" + btoa($(".synthesizer textarea").value); }
 			window.cancelAnimationFrame(request);
 
 			var vs = gl.createShader(gl.VERTEX_SHADER);
@@ -103,7 +103,7 @@
 		},
 
 		canvasSetup: function() {
-			gl = document.querySelector("#shader-canvas").getContext("webgl");
+			gl = $(".shader canvas").getContext("webgl");
 			gl.canvas.width = $view.offsetWidth;
 			gl.canvas.height = $view.offsetHeight;
 
@@ -115,9 +115,9 @@
 	$code.addEventListener("keydown", function(e) {
 		if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
 
-			Demo.Shader.compile();
-			location.hash = btoa(Demo.Shader.value);
 			e.preventDefault();
+			window.location.hash = btoa($code.value); + ";" + btoa($(".synthesizer textarea").value);
+			Demo.Shader.compile();
 
 		} else if (e.keyCode === 9) {
 
