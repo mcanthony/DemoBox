@@ -2,12 +2,12 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var t = 0;
+	var t = 0, sampleRate;
 	window.f = function(){};
 
 	var W, H, HW, HH;
-	var example = "/**\n * Synthesizer (Javascript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample\n * int      r // sample rate\n */\n\nfunction f(t) { return Math.sin(t*0.1); }";
-	var allowed = ["Math", "t", "r"];
+	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\nfunction f(t) { return Math.sin(t*0.1); }";
+	var allowed = ["Math", "r"];
 
 	// Settings
 	var bufferSize = 512;
@@ -45,7 +45,7 @@
 			$play.addEventListener("click", Demo.Synthesizer.togglePlayback);
 			$reset.addEventListener("click", Demo.Synthesizer.reset);
 
-			window.r = atx.sampleRate;
+			sampleRate = atx.sampleRate;
 			window.addEventListener("resize", Demo.Synthesizer.canvasSetup);
 		},
 
@@ -57,7 +57,7 @@
 				Demo.Synthesizer.display(data[i]=f(t++),i);
 			}
 
-			$time.innerHTML = (t/data.length).toFixed(2);
+			$time.innerHTML = (t/sampleRate).toFixed(2);
 		},
 
 		display: function(sample, i) {
@@ -78,8 +78,8 @@
 		},
 
 		reset: function() {
-			window.t = 0;
-			$time.innerHTML = (window.t/bufferSize/10).toFixed(2);
+			t = 0;
+			$time.innerHTML = (t/sampleRate).toFixed(2);
 			Demo.Synthesizer.togglePlayback(false);
 		},
 
@@ -105,7 +105,7 @@
 
 			$script = document.createElement("script");
 			$script.id = "script";
-			$script.innerHTML = "try{window.f=function(){"+Demo.Synthesizer.XSSPreventer()+$code.value+"\n;return f}()}catch(e){Demo.Synthesizer.error(e)}";
+			$script.innerHTML = "try{window.f=function(){"+Demo.Synthesizer.XSSPreventer()+"var r="+sampleRate+";"+$code.value+"\n;return f}()}catch(e){Demo.Synthesizer.error(e)}";
 
 			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
 			document.body.appendChild($script);
