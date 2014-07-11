@@ -56,11 +56,12 @@
 
 		process: function(e) {
 
-			var data = e.outputBuffer.getChannelData(0);
+			var ch0 = e.outputBuffer.getChannelData(0);
+			var ch1 = e.outputBuffer.getChannelData(1);
 
-			for (var i = 0, l = data.length; i < l; i++) {
-				Demo.Synthesizer.display(data[i]=f(t+=increase),i);
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,data[i]);
+			for (var i = 0, l = ch0.length; i < l; i++) {
+				Demo.Synthesizer.display(ch0[i]=ch1[i]=f(t+=increase),i);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,ch0[i]);
 			}
 		},
 
