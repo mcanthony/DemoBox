@@ -3,7 +3,7 @@
 	var gl, bfr, aPos, iGlobalTime, iResolution, request;
 
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
-	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;"
+	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;\n"
 	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n */\n\nvoid main()\n{\n\tvec2 uv = gl_FragCoord.xy/iResolution.xy;\n\tgl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
 
 	var $view = document.querySelector(".shader td");

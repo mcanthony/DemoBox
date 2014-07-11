@@ -104,7 +104,7 @@
 
 			$script = document.createElement("script");
 			$script.id = "script";
-			$script.innerHTML = $code.value.replace(/\/\*[\s\S]*\*\//g, "").trim();
+			$script.innerHTML = $code.value;
 			
 			document.body.appendChild($script);
 		},
