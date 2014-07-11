@@ -38,7 +38,6 @@
 			// Play
 			Demo.Synthesizer.parseCode();
 			Demo.Synthesizer.canvasSetup();
-			Demo.Synthesizer.generateThumbnail();
 
 			// Event-Listeners
 			$run.addEventListener("click", Demo.Synthesizer.parseCode, false);
@@ -121,6 +120,7 @@
 			ctx.fillStyle = "#111";
 			ctx.strokeStyle = lineColor;
 			ctx.lineWidth = lineWidth;
+			Demo.Synthesizer.generateThumbnail();
 		},
 
 		generateThumbnail: function() {
