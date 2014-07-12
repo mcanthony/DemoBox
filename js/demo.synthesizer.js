@@ -74,7 +74,7 @@
 
 			for (var i = 0, l = ch0.length; i < l; i++) {
 				Demo.Synthesizer.display(ch0[i]=ch1[i]=f(t+=increase),i);
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,ch0[i]);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,ch0[i]-(ch0[i-1]||0));
 			}
 		},
 
