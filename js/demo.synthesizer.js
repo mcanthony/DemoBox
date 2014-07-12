@@ -2,19 +2,19 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var t = 0, sampleRate, timer;
 	window.f = function(){};
+	var W, H, HW, HH, timer, t = 0;
 
-	var W, H, HW, HH;
+	var allowedVariables = ["Math", "r"];
 	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\nfunction f(t) { return 0.5 * Math.sin(880 * Math.PI * t); }";
-	var allowed = ["Math", "r"];
 
 	// Settings
 	var bufferSize = 512;
-	var increase;
 	var waveSize = 100;
 	var lineWidth = 5;
 	var lineColor = "#0F9";
+	var sampleRate;
+	var increase;
 
 	// Interfaces
 	var ctx = $(".synthesizer canvas").getContext("2d");
@@ -33,25 +33,27 @@
 
 		init: function() {
 
-			var base64 = window.location.hash.substr(1);
-			if (!base64) { $code.value = example; }
+			// Use default code example if there's no base64 URL hash
+			if (!Demo.base64) { $code.value = example; }
 
+			// Set system specific variables
 			sampleRate = atx.sampleRate;
 			increase = bufferSize/(sampleRate*bufferSize);
 
-			// Play
+			// Parse code and setup canvas
 			Demo.Synthesizer.parseCode();
 			Demo.Synthesizer.canvasSetup();
 
+			// Register audio process and start playback
 			node.onaudioprocess = Demo.Synthesizer.process;
 			Demo.Synthesizer.togglePlayback(true);
 
 			// Event-Listeners
 			$run.addEventListener("click", Demo.Synthesizer.parseCode, false);
-			$play.addEventListener("click", Demo.Synthesizer.togglePlayback);
-			$reset.addEventListener("click", Demo.Synthesizer.reset);
-
-			window.addEventListener("resize", Demo.Synthesizer.canvasSetup);
+			$play.addEventListener("click", Demo.Synthesizer.togglePlayback, false);
+			$reset.addEventListener("click", Demo.Synthesizer.reset, false);
+			$code.addEventListener("keydown", Demo.Synthesizer.onInput, false);
+			window.addEventListener("resize", Demo.Synthesizer.canvasSetup, false);
 		},
 
 		process: function(e) {
@@ -63,6 +65,18 @@
 				Demo.Synthesizer.display(ch0[i]=ch1[i]=f(t+=increase),i);
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,ch0[i]);
 			}
+		},
+
+		canvasSetup: function() {
+
+			// Update with and height variables
+			W = ctx.canvas.width = $view.offsetWidth;   HW = W>>1;
+			H = ctx.canvas.height = $view.offsetHeight; HH = H>>1;
+
+			// Reset context variables
+			ctx.fillStyle = "#111";
+			ctx.strokeStyle = lineColor;
+			ctx.lineWidth = lineWidth;
 		},
 
 		display: function(sample, i) {
@@ -82,10 +96,46 @@
 			if (i==bufferSize-1) { ctx.stroke(); }
 		},
 
-		reset: function() {
-			t = 0;
-			$time.innerHTML = "0.00";
-			// Demo.Synthesizer.togglePlayback(false);
+		XSSPreventer: function() {
+
+			var keys = [], key;
+			
+			// Gather all disallowed variables
+			for (key in window) {
+				if(!~allowedVariables.indexOf(key)) {
+					keys.push(key);
+				}
+			}
+
+			// Redefine them as undefined;
+			return "var " + keys.join(",") + ";"
+		},
+
+		parseCode: function(e) {
+
+			// Listen for nested errors which try-catch can't find
+			window.onerror = Demo.Synthesizer.error;
+
+			// Remove error class
+			$code.className = "";
+
+			// Remove the previous script
+			var $script = $("#synthesizer-script");
+			if ($script) { $script.remove(); }
+
+			// Create new script and safely insert the code
+			$script           = document.createElement("script");
+			$script.id        = "synthesizer-script";
+			$script.innerHTML = "try{window.f=function(r){"+Demo.Synthesizer.XSSPreventer()+$code.value+"\n;return f}("+sampleRate+")}catch(e){Demo.Synthesizer.error(e)}";
+
+			// Update the URL hash if the code was parsed due to a user event
+			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
+			
+			// Append the script
+			document.body.appendChild($script);
+
+			// Stop listening for global errors after a short time
+			window.setTimeout(function() { window.onerror = null; }, 100);
 		},
 
 		togglePlayback: function(e) {
@@ -106,72 +156,35 @@
 			$play.style.backgroundPosition = playing ? "0px 0px" : "-20px 0px";
 		},
 
-		parseCode: function(e) {
-
-			window.onerror = Demo.Synthesizer.error;
-			$code.className = "";
-
-			var $script = $("#script");
-			if ($script) { $script.remove(); }
-
-			$script = document.createElement("script");
-			$script.id = "script";
-			$script.innerHTML = "try{window.f=function(r){"+Demo.Synthesizer.XSSPreventer()+$code.value+"\n;return f}("+sampleRate+")}catch(e){Demo.Synthesizer.error(e)}";
-
-			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
-			document.body.appendChild($script);
-			window.onerror = null;
-		},
-
-		canvasSetup: function() {
-			W = ctx.canvas.width = $view.offsetWidth;   HW = W>>1;
-			H = ctx.canvas.height = $view.offsetHeight; HH = H>>1;
-
-			// Canvas setup
-			ctx.fillStyle = "#111";
-			ctx.strokeStyle = lineColor;
-			ctx.lineWidth = lineWidth;
-			//Demo.Synthesizer.generateThumbnail();
-		},
-
 		generateThumbnail: function() {
 			node.connect(atx.destination);
 			window.setTimeout(function() { node.disconnect(); }, 10);
 		},
 
-		XSSPreventer: function() {
-			var keys = [];
-			
-			for (var key in window) {
-				if(!~allowed.indexOf(key)) {
-					keys.push(key);
-				}
-			}
-
-			return "var " + keys.join(",") + ";"
+		reset: function() {
+			$time.innerHTML = "0.00"; t = 0;
 		},
 
 		error: function(e) {
 			$code.className = "error";
+		},
+
+		onInput: function(e) {
+			
+			if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
+				
+				e.preventDefault();
+				Demo.Synthesizer.parseCode(e);
+
+			} else if (e.keyCode === 9) {
+
+				var start = $code.selectionStart;
+				var end = $code.selectionEnd;
+				$code.value = ($code.value.substring(0, start) + "\t" + $code.value.substring(end));
+				$code.selectionStart = $code.selectionEnd = start + 1;
+				e.preventDefault();
+			}
 		}
 	};
-
-	// Run code and enable tabs
-	$code.addEventListener("keydown", function(e) {
-		if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
-			
-			e.preventDefault();
-			window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value);
-			Demo.Synthesizer.parseCode();
-
-		} else if (e.keyCode === 9) {
-
-			var start = $code.selectionStart;
-			var end = $code.selectionEnd;
-			$code.value = ($code.value.substring(0, start) + "\t" + $code.value.substring(end));
-			$code.selectionStart = $code.selectionEnd = start + 1;
-			e.preventDefault();
-		}
-	}, false);
 
 }(window.Demo || (window.Demo = {}), window));
