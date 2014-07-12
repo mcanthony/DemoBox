@@ -6,7 +6,7 @@
 	var W, H, HW, HH, timer, t = 0;
 
 	var allowedVariables = ["Math", "r"];
-	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\nfunction f(t) { return 0.5 * Math.sin(880 * Math.PI * t); }";
+	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Example by Killerwolf\n\nvar lastLoPass = 0;\nvar beat = [4,2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,14,4,6,2,10,2,6,6,4,6,6,2,10,2,4,2];\nvar melpitch = [4,3,3,4];\n\nfunction lopa(input, cutoff){\n	var retrn = lastLoPass + (cutoff*(input-lastLoPass)); \n	lastLoPass = retrn;\n	lastLoPass = retrn;\n	return retrn;\n}\n\nfunction f(t) {\n	return lopa(Math.sin(Math.sin(t*100*beat[~~(t*6)%42]*melpitch[~~(t*1.5)%4]))*0.6, 0.05);\n}\n";
 
 	// Settings
 	var bufferSize = 512;
