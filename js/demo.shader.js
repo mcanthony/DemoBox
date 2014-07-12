@@ -51,11 +51,12 @@
 			// Remove error class
 			$codeView.className = $codeView.className.replace("error", "");
 
+			var playStatus = Shader.pause;
 			var codeValue = Shader.Editor.getValue();
+			Shader.pause = true;
 
 			// Stop rendering while compiling
 			window.cancelAnimationFrame(Shader.animationRequest);
-			Shader.pause = true;
 
 			var vs = gl.createShader(gl.VERTEX_SHADER);
 			var fs = gl.createShader(gl.FRAGMENT_SHADER);
@@ -99,10 +100,13 @@
 
 			// Check for errors, else start rendering
 			if (gl.getError()) { Shader.error(); }
-			else { Shader.render(0); }
+			else {
+				Shader.pause = playStatus;
+				Shader.render();
+			}
 		},
 
-		render: function(time) {
+		render: function() {
 
 			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
 
@@ -150,7 +154,7 @@
 			if (!playing) {
 				Shader.playTime += new Date().getTime() - Shader.pauseTime;
 				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
-				Shader.render(0);
+				Shader.render();
 			} else {
 				Shader.pauseTime = new Date().getTime();
 				window.clearInterval(Shader.updateTimer);
