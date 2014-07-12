@@ -9,19 +9,31 @@
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;\n"
 	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from synthesizer from -1.0 to 1.0 \n */\n\nvoid main()\n{\n	vec2 uv = gl_FragCoord.xy/iResolution.xy;\n	gl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
 
-	var $view  = $(".shader td");
-	var $code  = $(".shader textarea");
-	var $play  = $(".shader .play-pause");
-	var $reset = $(".shader .reset");
-	var $run   = $(".shader .run");
-	var $time  = $(".shader .time");
+	// HTML-Elements
+	var $view     = $(".shader td");
+	var $codeView = $(".shader .code-view");
+	var $code     = $("#shader-editor");
+	var $play     = $(".shader .play-pause");
+	var $reset    = $(".shader .reset");
+	var $run      = $(".shader .run");
+	var $time     = $(".shader .time");
 
 	Demo.Shader = {
 
 		init: function() {
 
+			// Setup Ace-Editor
+			Demo.Shader.Editor = ace.edit("shader-editor");
+			Demo.Shader.Editor.setTheme("ace/theme/monokai");
+			Demo.Shader.Editor.getSession().setMode("ace/mode/glsl");
+			Demo.Shader.Editor.setShowPrintMargin(false);
+			Demo.Shader.Editor.getSession().setUseWrapMode(true);
+
 			// Use default code example if there's no base64 URL hash
-			if (!Demo.base64) { $code.value = fsc; }
+			if (Demo.base64.length==1) { Demo.Shader.Editor.setValue(fsc); }
+			else { Demo.Shader.Editor.setValue(atob(Demo.base64[0])); }
+			
+			Demo.Shader.Editor.gotoLine(0);
 
 			// Reference gl context
 			Demo.Shader.gl = gl;
@@ -42,7 +54,9 @@
 		compile: function(e) {
 
 			// Remove error class
-			$code.className = "";
+			$codeView.className = $codeView.className.replace("error", "");
+
+			var codeValue = Demo.Shader.Editor.getValue();
 
 			// Stop rendering while compiling
 			window.cancelAnimationFrame(request);
@@ -53,7 +67,7 @@
 			var program = gl.createProgram();
 
 			gl.shaderSource(vs, vsc);
-			gl.shaderSource(fs, fss + $code.value);
+			gl.shaderSource(fs, fss + codeValue);
 
 			gl.compileShader(vs);
 			gl.compileShader(fs);
@@ -86,7 +100,7 @@
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.hash = btoa($code.value) + ";" + btoa($(".synthesizer textarea").value); }
+			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.Synthesizer.Editor.getValue()); }
 
 			// Check for errors, else start rendering
 			if (gl.getError()) { Demo.Shader.error(); }
@@ -142,24 +156,13 @@
 		},
 
 		error: function(e) {
-			$code.className = "error";
+			$codeView.className += " error";
 		},
 
 		onInput: function(e) {
-
 			if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
-
 				e.preventDefault();
 				Demo.Shader.compile();
-
-			} else if (e.keyCode === 9) {
-
-				var start = $code.selectionStart;
-				var end = $code.selectionEnd;
-
-				$code.value = ($code.value.substring(0, start) + "\t" + $code.value.substring(end));
-				$code.selectionStart = Demo.Shader.selectionEnd = start + 1;
-				e.preventDefault();
 			}
 		}
 	};

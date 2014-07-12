@@ -2,13 +2,7 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	Demo.base64 = location.hash.substr(1);
-
-	if (Demo.base64) {
-		var base64 = Demo.base64.split(";");
-		$(".shader textarea").value = atob(base64[0]||"");
-		$(".synthesizer textarea").value = atob(base64[1]||"");
-	}
+	Demo.base64 = window.location.hash.substr(1).split(";");
 
 	Demo.Shader.init();
 	Demo.Synthesizer.init();

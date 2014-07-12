@@ -39,6 +39,10 @@ td {
 	height: 100%;
 }
 
+.code-view.error {
+	box-shadow: 0px 0px 0px 2px #F00;
+}
+
 .controls {
 	height: 10%;
 	padding: 10px;
@@ -94,9 +98,10 @@ td {
 		left: 10px;
 	}
 
-textarea {
+#shader-editor, #synthesizer-editor {
 	color: #FFF;
-	font-size: 10px;
+	font-size: 12px;
+	line-height: 16px;
 	font-family: "Lucida Console", monospace;
 	background-color: #333;
 
@@ -111,18 +116,4 @@ textarea {
 	white-space: pre;
 	box-sizing: border-box;
 	resize: none;
-}
-
-textarea.error {
-	box-shadow: inset 0px 0px 0px 2px #F00;
-}
-
-textarea::-webkit-scrollbar {
-	width: 12px;
-	background: #000;
-}
-
-textarea::-webkit-scrollbar-thumb {
-	width: 6px;
-	background: #666;
 }

@@ -22,19 +22,30 @@
 	var node = atx.createScriptProcessor(bufferSize,1,2);
 	
 	// HTML-Elements
-	var $view  = $(".synthesizer td");
-	var $code  = $(".synthesizer textarea");
-	var $play  = $(".synthesizer .play-pause");
-	var $reset = $(".synthesizer .reset");
-	var $run   = $(".synthesizer .run");
-	var $time  = $(".synthesizer .time");
+	var $view     = $(".synthesizer td");
+	var $codeView = $(".synthesizer .code-view");
+	var $code     = $("#synthesizer-editor");
+	var $play     = $(".synthesizer .play-pause");
+	var $reset    = $(".synthesizer .reset");
+	var $run      = $(".synthesizer .run");
+	var $time     = $(".synthesizer .time");
 
 	Demo.Synthesizer = {
 
 		init: function() {
 
+			// Setup Ace-Editor
+			Demo.Synthesizer.Editor = ace.edit("synthesizer-editor");
+			Demo.Synthesizer.Editor.setTheme("ace/theme/monokai");
+			Demo.Synthesizer.Editor.getSession().setMode("ace/mode/javascript");
+			Demo.Synthesizer.Editor.setShowPrintMargin(false);
+			Demo.Synthesizer.Editor.getSession().setUseWrapMode(true);
+
 			// Use default code example if there's no base64 URL hash
-			if (!Demo.base64) { $code.value = example; }
+			if (Demo.base64.length==1) { Demo.Synthesizer.Editor.setValue(example); }
+			else { Demo.Synthesizer.Editor.setValue(atob(Demo.base64[1])); }
+
+			Demo.Synthesizer.Editor.gotoLine(0);
 
 			// Set system specific variables
 			sampleRate = atx.sampleRate;
@@ -115,9 +126,10 @@
 
 			// Listen for nested errors which try-catch can't find
 			window.onerror = Demo.Synthesizer.error;
+			var codeValue = Demo.Synthesizer.Editor.getValue();
 
 			// Remove error class
-			$code.className = "";
+			$codeView.className = $codeView.className.replace("error", "");
 
 			// Remove the previous script
 			var $script = $("#synthesizer-script");
@@ -126,10 +138,10 @@
 			// Create new script and safely insert the code
 			$script           = document.createElement("script");
 			$script.id        = "synthesizer-script";
-			$script.innerHTML = "try{window.f=function(r){"+Demo.Synthesizer.XSSPreventer()+$code.value+"\n;return f}("+sampleRate+")}catch(e){Demo.Synthesizer.error(e)}";
+			$script.innerHTML = "try{window.f=function(r){"+Demo.Synthesizer.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){Demo.Synthesizer.error(e)}";
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.hash = btoa($(".shader textarea").value) + ";" + btoa($code.value); }
+			if (e) { window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); }
 			
 			// Append the script
 			document.body.appendChild($script);
@@ -166,23 +178,13 @@
 		},
 
 		error: function(e) {
-			$code.className = "error";
+			$codeView.className += " error";
 		},
 
 		onInput: function(e) {
-
 			if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
-				
 				e.preventDefault();
 				Demo.Synthesizer.parseCode(e);
-
-			} else if (e.keyCode === 9) {
-
-				var start = $code.selectionStart;
-				var end = $code.selectionEnd;
-				$code.value = ($code.value.substring(0, start) + "\t" + $code.value.substring(end));
-				$code.selectionStart = $code.selectionEnd = start + 1;
-				e.preventDefault();
 			}
 		}
 	};
