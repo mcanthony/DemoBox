@@ -51,9 +51,8 @@
 			// Remove error class
 			$codeView.className = $codeView.className.replace("error", "");
 
-			var playStatus = Shader.pause;
+			// Get glsl code
 			var codeValue = Shader.Editor.getValue();
-			Shader.pause = true;
 
 			// Stop rendering while compiling
 			window.cancelAnimationFrame(Shader.animationRequest);
@@ -101,10 +100,7 @@
 
 			// Check for errors, else start rendering
 			if (gl.getError()) { Shader.error(); }
-			else {
-				Shader.pause = playStatus;
-				Shader.render();
-			}
+			else { Shader.render(); }
 		},
 
 		render: function() {
