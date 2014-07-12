@@ -15,7 +15,7 @@
 	var $reset    = $(".shader .reset");
 	var $run      = $(".shader .run");
 	var $time     = $(".shader .time");
-	var $fps     = $(".shader .fps");
+	var $fps      = $(".shader .fps");
 
 	var Shader = Demo.Shader = {
 
@@ -144,14 +144,11 @@
 		},
 
 		togglePlayback: function(e) {
-			var playing;
 
-			if (typeof e == "boolean") { playing = !e; }
-			else { playing = e && e.target.getAttribute("data-status") == "1"; }
+			if (typeof e == "boolean") { Shader.pause = !e; }
+			else { Shader.pause = !Shader.pause; }
 
-			Shader.pause = playing;
-
-			if (!playing) {
+			if (!Shader.pause) {
 				Shader.playTime += new Date().getTime() - Shader.pauseTime;
 				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
 				Shader.render();
@@ -160,13 +157,14 @@
 				window.clearInterval(Shader.updateTimer);
 			}
 
-			$play.setAttribute("data-status", playing ? "0" : "1");
-			$play.style.backgroundPosition = playing ? "0px 0px" : "-20px 0px";
+			$play.setAttribute("data-status", Shader.pause ? "0" : "1");
+			$play.style.backgroundPosition = Shader.pause ? "0px 0px" : "-20px 0px";
 		},
 
 		reset: function() {
 			$time.innerHTML = "0.00";
-			Shader.playTime = Shader.pauseTime = 0;
+			if (Shader.pause){ Shader.playTime = Shader.pauseTime = 0; }
+			else { Shader.playTime = new Date().getTime(); }
 		},
 
 		error: function(e) {
