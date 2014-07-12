@@ -19,7 +19,7 @@
 	// Interfaces
 	var ctx = $(".synthesizer canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
-	var node = atx.createScriptProcessor(bufferSize,1,2);
+	var node = atx.createScriptProcessor(bufferSize,0,2);
 	
 	// HTML-Elements
 	var $view     = $(".synthesizer td");
