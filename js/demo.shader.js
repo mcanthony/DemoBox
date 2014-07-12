@@ -32,7 +32,7 @@
 			// Use default code example if there's no base64 URL hash
 			if (Demo.base64.length==1) { Demo.Shader.Editor.setValue(fsc); }
 			else { Demo.Shader.Editor.setValue(atob(Demo.base64[0])); }
-			
+
 			Demo.Shader.Editor.gotoLine(0);
 
 			// Reference gl context
@@ -104,7 +104,7 @@
 
 			// Check for errors, else start rendering
 			if (gl.getError()) { Demo.Shader.error(); }
-			else { Demo.Shader.render(0); }
+			else { Demo.Shader.stop = false; Demo.Shader.render(0); }
 		},
 
 		render: function(time) {
