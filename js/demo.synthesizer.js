@@ -66,7 +66,7 @@
 
 			for (var i = 0, l = ch0.length; i < l; i++) {
 
-				Synth.display(ch0[i]=ch1[i]=f(Synth.time+=increase),i);
+				Synth.displayWave(ch0[i]=ch1[i]=f(Synth.time+=increase),i);
 				
 				current = ch0[i];
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
@@ -74,6 +74,7 @@
 			}
 
 			Synth.freq = freq;
+			Synth.displaySpectrum(ch0);
 		},
 
 		canvasSetup: function() {
@@ -88,13 +89,15 @@
 			ctx.lineWidth = lineWidth;
 		},
 
-		display: function(sample, i) {
+		displayWave: function(sample, i) {
 
 			var x = (i/bufferSize)*W;
 			var y = sample*waveSize+HH;
 
+			var frequencies
+
 			if (i==0) {
-				
+
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,Synth.freq);
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSync,Synth.time);
 
@@ -107,6 +110,25 @@
 			ctx.lineTo(x,y);
 
 			if (i==bufferSize-1) { ctx.stroke(); }
+		},
+
+		displaySpectrum: function(data) {
+
+			var l = 512, u = W/l, i, j, real, imag;
+
+			ctx.fillStyle = "#999";
+
+			for(i=0; i < l; i++ ) {
+
+				real = imag = 0;
+
+				for(j=0; j < l; j++ ) {
+					real += data[j]*Math.cos(Math.PI*i*j/l);
+					//imag += data[j]*Math.sin(-2*Math.PI*i*j/l);
+				}
+
+				ctx.fillRect(i*u,H,u*2,-Math.abs(real)*0.5);
+			}
 		},
 
 		XSSPreventer: function() {

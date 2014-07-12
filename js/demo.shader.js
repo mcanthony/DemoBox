@@ -108,7 +108,6 @@
 		render: function() {
 
 			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
-
 			Shader.time = (new Date().getTime() - Shader.playTime) / 1000;
 
 			gl.uniform1f(Shader.iGlobalTime, Shader.time);
@@ -120,7 +119,6 @@
 
 		getFPS: function() {
 
-			Shader.frameNumber++;
 			var interval = (new Date().getTime()-Shader.fpsStartTime)/1000;
 
 			if (interval>1) {
@@ -128,7 +126,7 @@
 				Shader.frameNumber = 0;
 			}
 
-			return Math.floor(Shader.frameNumber/interval);
+			return Math.floor(++Shader.frameNumber/interval);
 		},
 
 		canvasSetup: function() {
