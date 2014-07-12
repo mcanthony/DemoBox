@@ -9,14 +9,14 @@ html {
 	background-color: #000;
 }
 
-#credits {
+#author {
 	position: absolute;
 	bottom: 10px;
 	left: 12px;
 	color: #666;
 }
 
-#credits a { color: #669;}
+#author a { color: #669;}
 
 canvas { display: block; }
 
