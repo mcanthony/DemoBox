@@ -9,4 +9,4 @@ The current version features a (fragment) shader and synthesizer interface.
 
 ##Screenshot
 
-![](https://i.imgur.com/Ga1WjWu.png)
+![](https://i.imgur.com/6aRFsnF.png)
