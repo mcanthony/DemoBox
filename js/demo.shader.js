@@ -2,7 +2,7 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var aPos, bfr, iGlobalTime, iResolution, iSample, request, timer, pauseTime = new Date().getTime(), startTime = performance.now(), t = 0;
+	var fps = 0, aPos, bfr, iGlobalTime, iResolution, iSample, request, timer, currentTime, lastTime, pauseTime = new Date().getTime(), startTime = performance.now(), t = 0;
 
 	var gl  = $(".shader canvas").getContext("webgl");
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
@@ -17,29 +17,14 @@
 	var $reset    = $(".shader .reset");
 	var $run      = $(".shader .run");
 	var $time     = $(".shader .time");
+	var $fps     = $(".shader .fps");
 
 	Demo.Shader = {
 
 		init: function() {
 
 			// Setup Ace-Editor
-			Demo.Shader.Editor = ace.edit("shader-editor");
-			Demo.Shader.Editor.setTheme("ace/theme/monokai");
-			Demo.Shader.Editor.getSession().setMode("ace/mode/glsl");
-			Demo.Shader.Editor.setShowPrintMargin(false);
-			Demo.Shader.Editor.getSession().setUseWrapMode(true);
-
-			Demo.Shader.Editor.commands.addCommand({
-				name: 'compile',
-				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
-				exec: Demo.Shader.compile
-			});
-
-			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { Demo.Shader.Editor.setValue(fsc); }
-			else { Demo.Shader.Editor.setValue(atob(Demo.base64[0])); }
-
-			Demo.Shader.Editor.gotoLine(0);
+			Demo.Shader.setupEditor();
 
 			// Reference gl context
 			Demo.Shader.gl = gl;
@@ -117,6 +102,11 @@
 			request = !Demo.Shader.stop && window.requestAnimationFrame(Demo.Shader.render);
 
 			t = (time-startTime) / 1000;
+
+			currentTime = new Date().getTime();
+			fps = (1-(currentTime-lastTime))*60;
+			lastTime = currentTime;
+
 			gl.uniform1f(iGlobalTime, t);
 			gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -143,7 +133,7 @@
 
 			if (!playing) {
 				startTime += new Date().getTime() - pauseTime;
-				timer = window.setInterval(function() { $time.innerHTML = t.toFixed(2); }, 100);
+				timer = window.setInterval(Demo.Shader.updateInfo, 100);
 				Demo.Shader.render(0);
 			} else {
 				pauseTime = new Date().getTime();
@@ -162,6 +152,32 @@
 
 		error: function(e) {
 			$codeView.className += " error";
+		},
+
+		setupEditor: function() {
+
+			Demo.Shader.Editor = ace.edit("shader-editor");
+			Demo.Shader.Editor.setTheme("ace/theme/monokai");
+			Demo.Shader.Editor.getSession().setMode("ace/mode/glsl");
+			Demo.Shader.Editor.setShowPrintMargin(false);
+			Demo.Shader.Editor.getSession().setUseWrapMode(true);
+
+			Demo.Shader.Editor.commands.addCommand({
+				name: 'compile',
+				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+				exec: Demo.Shader.compile
+			});			
+
+			// Use default code example if there's no base64 URL hash
+			if (Demo.base64.length==1) { Demo.Shader.Editor.setValue(fsc); }
+			else { Demo.Shader.Editor.setValue(atob(Demo.base64[0])); }
+
+			Demo.Shader.Editor.gotoLine(0);
+		},
+
+		updateInfo: function() {
+			$time.innerHTML = t.toFixed(2);
+			$fps.innerHTML = (fps<9?"0"+fps:fps) + " FPS";
 		}
 	};
 

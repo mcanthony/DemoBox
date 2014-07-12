@@ -90,13 +90,15 @@ td {
 		background-color: #777;
 	}
 
-	.time {
+	.time, .fps {
 		color: #999;
 		font-weight: bold;
 		position: relative;
 		top: 8px;
 		left: 10px;
 	}
+
+	.fps { left: 15px; }
 
 #shader-editor, #synthesizer-editor {
 	color: #FFF;

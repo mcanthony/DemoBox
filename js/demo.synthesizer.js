@@ -35,23 +35,7 @@
 		init: function() {
 
 			// Setup Ace-Editor
-			Demo.Synthesizer.Editor = ace.edit("synthesizer-editor");
-			Demo.Synthesizer.Editor.setTheme("ace/theme/monokai");
-			Demo.Synthesizer.Editor.getSession().setMode("ace/mode/javascript");
-			Demo.Synthesizer.Editor.setShowPrintMargin(false);
-			Demo.Synthesizer.Editor.getSession().setUseWrapMode(true);
-
-			Demo.Synthesizer.Editor.commands.addCommand({
-				name: 'compile',
-				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
-				exec: Demo.Synthesizer.parseCode
-			});
-
-			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { Demo.Synthesizer.Editor.setValue(example); }
-			else { Demo.Synthesizer.Editor.setValue(atob(Demo.base64[1])); }
-
-			Demo.Synthesizer.Editor.gotoLine(0);
+			Demo.Synthesizer.setupEditor();
 
 			// Set system specific variables
 			sampleRate = atx.sampleRate;
@@ -184,6 +168,27 @@
 
 		error: function(e) {
 			$codeView.className += " error";
+		},
+
+		setupEditor: function() {
+
+			Demo.Synthesizer.Editor = ace.edit("synthesizer-editor");
+			Demo.Synthesizer.Editor.setTheme("ace/theme/monokai");
+			Demo.Synthesizer.Editor.getSession().setMode("ace/mode/javascript");
+			Demo.Synthesizer.Editor.setShowPrintMargin(false);
+			Demo.Synthesizer.Editor.getSession().setUseWrapMode(true);
+
+			Demo.Synthesizer.Editor.commands.addCommand({
+				name: 'compile',
+				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+				exec: Demo.Synthesizer.parseCode
+			});
+
+			// Use default code example if there's no base64 URL hash
+			if (Demo.base64.length==1) { Demo.Synthesizer.Editor.setValue(example); }
+			else { Demo.Synthesizer.Editor.setValue(atob(Demo.base64[1])); }
+
+			Demo.Synthesizer.Editor.gotoLine(0);
 		}
 	};
 
