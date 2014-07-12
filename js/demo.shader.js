@@ -2,7 +2,7 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var fps = 0, aPos, bfr, iGlobalTime, iResolution, iSample, request, timer, currentTime, lastTime, pauseTime = new Date().getTime(), startTime = performance.now(), t = 0;
+	var fps = 0, t = 0;
 
 	var gl  = $(".shader canvas").getContext("webgl");
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
@@ -19,26 +19,32 @@
 	var $time     = $(".shader .time");
 	var $fps     = $(".shader .fps");
 
-	Demo.Shader = {
+	var Shader = Demo.Shader = {
+
+		pause: false,
+		frameNumber: 0,
+		playTime: 0,
+		pauseTime: 0,
+		fpsStartTime: 0,
 
 		init: function() {
 
 			// Setup Ace-Editor
-			Demo.Shader.setupEditor();
+			Shader.setupEditor();
 
 			// Reference gl context
-			Demo.Shader.gl = gl;
+			Shader.gl = gl;
 
 			// Setup view, compile and run
-			Demo.Shader.canvasSetup();
-			Demo.Shader.compile();
-			Demo.Shader.togglePlayback(true);
+			Shader.canvasSetup();
+			Shader.compile();
+			Shader.togglePlayback(true);
 
 			// Register event-listeners
-			$run.addEventListener("click", Demo.Shader.compile, false);
-			$play.addEventListener("click", Demo.Shader.togglePlayback, false);
-			$reset.addEventListener("click", Demo.Shader.reset, false);
-			window.addEventListener("resize", Demo.Shader.canvasSetup, false);
+			$run.addEventListener("click", Shader.compile, false);
+			$play.addEventListener("click", Shader.togglePlayback, false);
+			$reset.addEventListener("click", Shader.reset, false);
+			window.addEventListener("resize", Shader.canvasSetup, false);
 		},
 
 		compile: function(e) {
@@ -46,11 +52,11 @@
 			// Remove error class
 			$codeView.className = $codeView.className.replace("error", "");
 
-			var codeValue = Demo.Shader.Editor.getValue();
+			var codeValue = Shader.Editor.getValue();
 
 			// Stop rendering while compiling
-			window.cancelAnimationFrame(request);
-			Demo.Shader.stop = true;
+			window.cancelAnimationFrame(Shader.animationRequest);
+			Shader.pause = true;
 
 			var vs = gl.createShader(gl.VERTEX_SHADER);
 			var fs = gl.createShader(gl.FRAGMENT_SHADER);
@@ -72,13 +78,13 @@
 			gl.deleteShader(fs);
 			gl.deleteProgram(program);
 
-			bfr = gl.createBuffer();
-			aPos = gl.getAttribLocation(program, "aPos");
+			var bfr = gl.createBuffer();
+			Shader.aPos = gl.getAttribLocation(program, "aPos");
 
 			// Setup uniforms
-			Demo.Shader.iGlobalTime = iGlobalTime = gl.getUniformLocation(program, "iGlobalTime");
-			Demo.Shader.iResolution = iResolution = gl.getUniformLocation(program, "iResolution");
-			Demo.Shader.iSample     = iSample     = gl.getUniformLocation(program, "iSample");
+			Shader.iGlobalTime = gl.getUniformLocation(program, "iGlobalTime");
+			Shader.iResolution = gl.getUniformLocation(program, "iResolution");
+			Shader.iSample     = gl.getUniformLocation(program, "iSample");
 
 			// Setup rectangle vertices
 			gl.bindBuffer(gl.ARRAY_BUFFER, bfr);
@@ -86,30 +92,41 @@
 			gl.enableVertexAttribArray(bfr);
 
 			// Setup viewport
-			gl.uniform2f(iResolution, gl.canvas.width, gl.canvas.height);
+			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 			// Update the URL hash if the code was parsed due to a user event
 			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.Synthesizer.Editor.getValue()); }
 
 			// Check for errors, else start rendering
-			if (gl.getError()) { Demo.Shader.error(); }
-			else { Demo.Shader.stop = false; Demo.Shader.render(0); }
+			if (gl.getError()) { Shader.error(); }
+			else { Shader.render(0); }
 		},
 
 		render: function(time) {
 
-			request = !Demo.Shader.stop && window.requestAnimationFrame(Demo.Shader.render);
+			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
 
-			t = (time-startTime) / 1000;
+			t = (new Date().getTime() - Shader.playTime) / 1000;
 
-			currentTime = new Date().getTime();
-			fps = (1-(currentTime-lastTime))*60;
-			lastTime = currentTime;
-
-			gl.uniform1f(iGlobalTime, t);
-			gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+			gl.uniform1f(Shader.iGlobalTime, t);
+			gl.vertexAttribPointer(Shader.aPos, 2, gl.FLOAT, false, 0, 0);
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+			fps = Shader.getFPS();
+		},
+
+		getFPS: function() {
+
+			Shader.frameNumber++;
+			var interval = (new Date().getTime()-Shader.fpsStartTime)/1000;
+
+			if (interval>1) {
+				Shader.fpsStartTime = new Date().getTime();
+				Shader.frameNumber = 0;
+			}
+
+			return Math.floor(Shader.frameNumber/interval);
 		},
 
 		canvasSetup: function() {
@@ -119,7 +136,7 @@
 			gl.canvas.height = $view.offsetHeight;
 
 			// Update uniform and viewport
-			gl.uniform2f(iResolution, gl.canvas.width, gl.canvas.height);
+			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 		},
 
@@ -129,15 +146,16 @@
 			if (typeof e == "boolean") { playing = !e; }
 			else { playing = e && e.target.getAttribute("data-status") == "1"; }
 
-			Demo.Shader.stop = playing;
+			Shader.pause = playing;
 
 			if (!playing) {
-				startTime += new Date().getTime() - pauseTime;
-				timer = window.setInterval(Demo.Shader.updateInfo, 100);
-				Demo.Shader.render(0);
+				Shader.playTime += new Date().getTime() - Shader.pauseTime;
+				console.log(Shader.playTime);
+				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
+				Shader.render(0);
 			} else {
-				pauseTime = new Date().getTime();
-				window.clearInterval(timer);
+				Shader.pauseTime = new Date().getTime();
+				window.clearInterval(Shader.updateTimer);
 			}
 
 			$play.setAttribute("data-status", playing ? "0" : "1");
@@ -146,8 +164,7 @@
 
 		reset: function() {
 			$time.innerHTML = "0.00";
-			pauseTime = new Date().getTime();
-			startTime =  window.performance.now();
+			Shader.playTime = Shader.pauseTime = 0;
 		},
 
 		error: function(e) {
@@ -156,23 +173,23 @@
 
 		setupEditor: function() {
 
-			Demo.Shader.Editor = ace.edit("shader-editor");
-			Demo.Shader.Editor.setTheme("ace/theme/monokai");
-			Demo.Shader.Editor.getSession().setMode("ace/mode/glsl");
-			Demo.Shader.Editor.setShowPrintMargin(false);
-			Demo.Shader.Editor.getSession().setUseWrapMode(true);
+			Shader.Editor = ace.edit("shader-editor");
+			Shader.Editor.setTheme("ace/theme/monokai");
+			Shader.Editor.getSession().setMode("ace/mode/glsl");
+			Shader.Editor.setShowPrintMargin(false);
+			Shader.Editor.getSession().setUseWrapMode(true);
 
-			Demo.Shader.Editor.commands.addCommand({
+			Shader.Editor.commands.addCommand({
 				name: 'compile',
 				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
-				exec: Demo.Shader.compile
+				exec: Shader.compile
 			});			
 
 			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { Demo.Shader.Editor.setValue(fsc); }
-			else { Demo.Shader.Editor.setValue(atob(Demo.base64[0])); }
+			if (Demo.base64.length==1) { Shader.Editor.setValue(fsc); }
+			else { Shader.Editor.setValue(atob(Demo.base64[0])); }
 
-			Demo.Shader.Editor.gotoLine(0);
+			Shader.Editor.gotoLine(0);
 		},
 
 		updateInfo: function() {
