@@ -65,6 +65,7 @@
 			var freq = 0, current, last;
 
 			for (var i = 0, l = ch0.length; i < l; i++) {
+
 				Synth.display(ch0[i]=ch1[i]=f(Synth.time+=increase),i);
 				
 				current = ch0[i];
@@ -93,7 +94,10 @@
 			var y = sample*waveSize+HH;
 
 			if (i==0) {
+				
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,Synth.freq);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSync,Synth.time);
+
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
 				ctx.beginPath(); ctx.moveTo(x,y);

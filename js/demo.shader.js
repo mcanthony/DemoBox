@@ -4,8 +4,8 @@
 
 	var gl  = $(".shader canvas").getContext("webgl");
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
-	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;\n"
-	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from synthesizer from -1.0 to 1.0 \n */\n\nvoid main()\n{\n	vec2 uv = gl_FragCoord.xy/iResolution.xy;\n	gl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
+	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;uniform float iSync;\n"
+	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from synthesizer from -1.0 to 1.0 \n * float iSync       // Current synthesizer playback time in seconds\n */\n\nvoid main()\n{\n	vec2 uv = gl_FragCoord.xy/iResolution.xy;\n	gl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
 
 	// HTML-Elements
 	var $view     = $(".shader td");
@@ -85,6 +85,7 @@
 			Shader.iGlobalTime = gl.getUniformLocation(program, "iGlobalTime");
 			Shader.iResolution = gl.getUniformLocation(program, "iResolution");
 			Shader.iSample     = gl.getUniformLocation(program, "iSample");
+			Shader.iSync       = gl.getUniformLocation(program, "iSync");
 
 			// Setup rectangle vertices
 			gl.bindBuffer(gl.ARRAY_BUFFER, bfr);
