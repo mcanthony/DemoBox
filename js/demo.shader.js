@@ -98,8 +98,10 @@
 			// Update the URL hash if the code was parsed due to a user event
 			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.Synthesizer.Editor.getValue()); }
 
+			var err = gl.getError();
+
 			// Check for errors, else start rendering
-			if (gl.getError()) { Shader.error(); }
+			if (err&&err!=gl.INVALID_VALUE) { Shader.error(); }
 			else { Shader.render(); }
 		},
 
