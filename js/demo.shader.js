@@ -78,7 +78,7 @@
 			gl.deleteShader(fs);
 			gl.deleteProgram(program);
 
-			var bfr = gl.createBuffer();
+			Shader.bfr = gl.createBuffer();
 			Shader.aPos = gl.getAttribLocation(program, "aPos");
 
 			// Setup uniforms
@@ -88,9 +88,9 @@
 			Shader.iSync       = gl.getUniformLocation(program, "iSync");
 
 			// Setup rectangle vertices
-			gl.bindBuffer(gl.ARRAY_BUFFER, bfr);
+			gl.bindBuffer(gl.ARRAY_BUFFER, Shader.bfr);
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1.0,-1.0,1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,1.0,-1.0,1.0]), gl.STATIC_DRAW);
-			gl.enableVertexAttribArray(bfr);
+			gl.enableVertexAttribArray(Shader.bfr);
 
 			// Setup viewport
 			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
