@@ -150,7 +150,6 @@
 
 			if (!playing) {
 				Shader.playTime += new Date().getTime() - Shader.pauseTime;
-				console.log(Shader.playTime);
 				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
 				Shader.render(0);
 			} else {
