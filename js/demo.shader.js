@@ -29,6 +29,12 @@
 			Demo.Shader.Editor.setShowPrintMargin(false);
 			Demo.Shader.Editor.getSession().setUseWrapMode(true);
 
+			Demo.Shader.Editor.commands.addCommand({
+				name: 'compile',
+				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
+				exec: Demo.Shader.compile
+			});
+
 			// Use default code example if there's no base64 URL hash
 			if (Demo.base64.length==1) { Demo.Shader.Editor.setValue(fsc); }
 			else { Demo.Shader.Editor.setValue(atob(Demo.base64[0])); }
@@ -47,7 +53,6 @@
 			$run.addEventListener("click", Demo.Shader.compile, false);
 			$play.addEventListener("click", Demo.Shader.togglePlayback, false);
 			$reset.addEventListener("click", Demo.Shader.reset, false);
-			$code.addEventListener("keydown", Demo.Shader.onInput, false);
 			window.addEventListener("resize", Demo.Shader.canvasSetup, false);
 		},
 
@@ -157,13 +162,6 @@
 
 		error: function(e) {
 			$codeView.className += " error";
-		},
-
-		onInput: function(e) {
-			if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
-				e.preventDefault();
-				Demo.Shader.compile();
-			}
 		}
 	};
 
