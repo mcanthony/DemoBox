@@ -119,3 +119,13 @@ td {
 	box-sizing: border-box;
 	resize: none;
 }
+
+.ace_scrollbar-v::-webkit-scrollbar {
+	width: 12px;
+	background: #333;
+}
+
+.ace_scrollbar-v::-webkit-scrollbar-thumb {
+	width: 6px;
+	background: #666;
+}
