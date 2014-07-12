@@ -3,10 +3,10 @@
 	function $(str) { return document.querySelector(str); }
 
 	window.f = function(){};
-	var W, H, HW, HH, timer, t = 0;
+	var W, H, HW, HH, timer;
 
 	var allowedVariables = ["Math", "r"];
-	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Example by Killerwolf\n\nvar lastLoPass = 0;\nvar beat = [4,2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,14,4,6,2,10,2,6,6,4,6,6,2,10,2,4,2];\nvar melpitch = [4,3,3,4];\n\nfunction lopa(input, cutoff){\n	var retrn = lastLoPass + (cutoff*(input-lastLoPass)); \n	lastLoPass = retrn;\n	lastLoPass = retrn;\n	return retrn;\n}\n\nfunction f(t) {\n	return lopa(Math.sin(Math.sin(t*100*beat[~~(t*6)%42]*melpitch[~~(t*1.5)%4]))*0.6, 0.05);\n}\n";
+	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      Synth.time // current sample passed to f()\n * int      r // sample rate\n */\n\n// Example by Killerwolf\n\nvar lastLoPass = 0;\nvar beat = [4,2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,14,4,6,2,10,2,6,6,4,6,6,2,10,2,4,2];\nvar melpitch = [4,3,3,4];\n\nfunction lopa(input, cutoff){\n	var retrn = lastLoPass + (cutoff*(input-lastLoPass)); \n	lastLoPass = retrn;\n	lastLoPass = retrn;\n	return retrn;\n}\n\nfunction f(t) {\n	return lopa(Math.sin(Math.sin(t*100*beat[~~(t*6)%42]*melpitch[~~(t*1.5)%4]))*0.6, 0.05);\n}\n";
 
 	// Settings
 	var bufferSize = 512;
@@ -31,6 +31,8 @@
 	var $time     = $(".synthesizer .time");
 
 	var Synth = Demo.Synthesizer = {
+
+		time: 0,
 
 		init: function() {
 
@@ -62,7 +64,7 @@
 			var ch1 = e.outputBuffer.getChannelData(1);
 
 			for (var i = 0, l = ch0.length; i < l; i++) {
-				Synth.display(ch0[i]=ch1[i]=f(t+=increase),i);
+				Synth.display(ch0[i]=ch1[i]=f(Synth.time+=increase),i);
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,ch0[i]-(ch0[i-1]||0));
 			}
 		},
@@ -113,7 +115,7 @@
 
 		parseCode: function(e) {
 
-			// Listen for nested errors which try-catch can't find
+			// Listen for nested errors which try-catch can'Synth.time find
 			window.onerror = Synth.error;
 			var codeValue = Synth.Editor.getValue();
 
@@ -146,7 +148,7 @@
 			else { playing = e && e.target.getAttribute("data-status") == "1"; }
 
 			if (!playing) {
-				timer = window.setInterval(function() { $time.innerHTML = ((t*(1/increase))/sampleRate).toFixed(2); }, 100);
+				timer = window.setInterval(function() { $time.innerHTML = ((Synth.time*(1/increase))/sampleRate).toFixed(2); }, 100);
 				node.connect(atx.destination);
 			} else {
 				window.clearInterval(timer);
@@ -163,7 +165,7 @@
 		},
 
 		reset: function() {
-			$time.innerHTML = "0.00"; t = 0;
+			$time.innerHTML = "0.00"; Synth.time = 0;
 		},
 
 		error: function(e) {

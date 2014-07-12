@@ -2,8 +2,6 @@
 
 	function $(str) { return document.querySelector(str); }
 
-	var fps = 0, t = 0;
-
 	var gl  = $(".shader canvas").getContext("webgl");
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;\n"
@@ -21,6 +19,7 @@
 
 	var Shader = Demo.Shader = {
 
+		time: 0,
 		pause: false,
 		frameNumber: 0,
 		playTime: 0,
@@ -107,13 +106,13 @@
 
 			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
 
-			t = (new Date().getTime() - Shader.playTime) / 1000;
+			Shader.time = (new Date().getTime() - Shader.playTime) / 1000;
 
-			gl.uniform1f(Shader.iGlobalTime, t);
+			gl.uniform1f(Shader.iGlobalTime, Shader.time);
 			gl.vertexAttribPointer(Shader.aPos, 2, gl.FLOAT, false, 0, 0);
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-			fps = Shader.getFPS();
+			Shader.fps = Shader.getFPS();
 		},
 
 		getFPS: function() {
@@ -192,8 +191,8 @@
 		},
 
 		updateInfo: function() {
-			$time.innerHTML = t.toFixed(2);
-			$fps.innerHTML = (fps<9?"0"+fps:fps) + " FPS";
+			$time.innerHTML = Shader.time.toFixed(2);
+			$fps.innerHTML = (Shader.fps<9?"0"+Shader.fps:Shader.fps) + " FPS";
 		}
 	};
 
