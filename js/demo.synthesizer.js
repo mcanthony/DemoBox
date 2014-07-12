@@ -85,9 +85,9 @@
 			var y = sample*waveSize+HH;
 
 			if (i==0) {
-				ctx.fillRect(0,0,W,H);
-				ctx.beginPath();
-				ctx.moveTo(x,y);
+				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
+				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
+				ctx.beginPath(); ctx.moveTo(x,y);
 				return;
 			}
 
@@ -170,7 +170,7 @@
 		},
 
 		onInput: function(e) {
-			
+
 			if (e.ctrlKey && [13, 83].indexOf(e.keyCode) != -1) {
 				
 				e.preventDefault();
