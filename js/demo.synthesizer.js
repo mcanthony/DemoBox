@@ -30,30 +30,30 @@
 	var $run      = $(".synthesizer .run");
 	var $time     = $(".synthesizer .time");
 
-	Demo.Synthesizer = {
+	var Synth = Demo.Synthesizer = {
 
 		init: function() {
 
 			// Setup Ace-Editor
-			Demo.Synthesizer.setupEditor();
+			Synth.setupEditor();
 
 			// Set system specific variables
 			sampleRate = atx.sampleRate;
 			increase = bufferSize/(sampleRate*bufferSize);
 
 			// Parse code and setup canvas
-			Demo.Synthesizer.parseCode();
-			Demo.Synthesizer.canvasSetup();
+			Synth.parseCode();
+			Synth.canvasSetup();
 
 			// Register audio process and start playback
-			node.onaudioprocess = Demo.Synthesizer.process;
-			Demo.Synthesizer.togglePlayback(true);
+			node.onaudioprocess = Synth.process;
+			Synth.togglePlayback(true);
 
 			// Event-Listeners
-			$run.addEventListener("click", Demo.Synthesizer.parseCode, false);
-			$play.addEventListener("click", Demo.Synthesizer.togglePlayback, false);
-			$reset.addEventListener("click", Demo.Synthesizer.reset, false);
-			window.addEventListener("resize", Demo.Synthesizer.canvasSetup, false);
+			$run.addEventListener("click", Synth.parseCode, false);
+			$play.addEventListener("click", Synth.togglePlayback, false);
+			$reset.addEventListener("click", Synth.reset, false);
+			window.addEventListener("resize", Synth.canvasSetup, false);
 		},
 
 		process: function(e) {
@@ -62,7 +62,7 @@
 			var ch1 = e.outputBuffer.getChannelData(1);
 
 			for (var i = 0, l = ch0.length; i < l; i++) {
-				Demo.Synthesizer.display(ch0[i]=ch1[i]=f(t+=increase),i);
+				Synth.display(ch0[i]=ch1[i]=f(t+=increase),i);
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,ch0[i]-(ch0[i-1]||0));
 			}
 		},
@@ -114,8 +114,8 @@
 		parseCode: function(e) {
 
 			// Listen for nested errors which try-catch can't find
-			window.onerror = Demo.Synthesizer.error;
-			var codeValue = Demo.Synthesizer.Editor.getValue();
+			window.onerror = Synth.error;
+			var codeValue = Synth.Editor.getValue();
 
 			// Remove error class
 			$codeView.className = $codeView.className.replace("error", "");
@@ -127,7 +127,7 @@
 			// Create new script and safely insert the code
 			$script           = document.createElement("script");
 			$script.id        = "synthesizer-script";
-			$script.innerHTML = "try{window.f=function(r){"+Demo.Synthesizer.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){Demo.Synthesizer.error(e)}";
+			$script.innerHTML = "try{window.f=function(r){"+Synth.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){Synth.error(e)}";
 
 			// Update the URL hash if the code was parsed due to a user event
 			if (e) { window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); }
@@ -172,23 +172,23 @@
 
 		setupEditor: function() {
 
-			Demo.Synthesizer.Editor = ace.edit("synthesizer-editor");
-			Demo.Synthesizer.Editor.setTheme("ace/theme/monokai");
-			Demo.Synthesizer.Editor.getSession().setMode("ace/mode/javascript");
-			Demo.Synthesizer.Editor.setShowPrintMargin(false);
-			Demo.Synthesizer.Editor.getSession().setUseWrapMode(true);
+			Synth.Editor = ace.edit("synthesizer-editor");
+			Synth.Editor.setTheme("ace/theme/monokai");
+			Synth.Editor.getSession().setMode("ace/mode/javascript");
+			Synth.Editor.setShowPrintMargin(false);
+			Synth.Editor.getSession().setUseWrapMode(true);
 
-			Demo.Synthesizer.Editor.commands.addCommand({
+			Synth.Editor.commands.addCommand({
 				name: 'compile',
 				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
-				exec: Demo.Synthesizer.parseCode
+				exec: Synth.parseCode
 			});
 
 			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { Demo.Synthesizer.Editor.setValue(example); }
-			else { Demo.Synthesizer.Editor.setValue(atob(Demo.base64[1])); }
+			if (Demo.base64.length==1) { Synth.Editor.setValue(example); }
+			else { Synth.Editor.setValue(atob(Demo.base64[1])); }
 
-			Demo.Synthesizer.Editor.gotoLine(0);
+			Synth.Editor.gotoLine(0);
 		}
 	};
 
