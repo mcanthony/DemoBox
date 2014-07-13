@@ -7,6 +7,24 @@ The current version features a (fragment) shader and synthesizer interface.
 **Demo:** http://elias-schuett.de/git/HTML5-Demo-Tool  
 **License:** CC-BY-NC-SA 4.0 - https://creativecommons.org/licenses/by-nc-sa/4.0/
 
+##Features
+
+######Implemented
+* Fragment-Shader-Interface
+* Synthesizer-Interface
+* Syntax-Highlighting ([ACE](https://github.com/ajaxorg/ace))
+* Time-Controls
+* Mic-Input-Support
+* Wave-Diagram
+* Spectrum-Diagram
+
+######Planned
+* Spectrogram
+* Texture-Channels
+* Fullscreen-Controls
+* GLSL-Syntax-Checking
+
+
 ##Screenshot
 
-![](https://i.imgur.com/6aRFsnF.png)
+![](https://i.imgur.com/jYvbNq7.png)
