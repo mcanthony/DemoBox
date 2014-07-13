@@ -15,6 +15,7 @@
 	var lineColor = "#0F9";
 	var sampleRate;
 	var increase;
+	var scroll = 0;
 
 	// Interfaces
 	var ctx = $(".synthesizer canvas").getContext("2d");
@@ -132,6 +133,28 @@
 			}
 
 			ctx.fill();
+		},
+
+		displaySpectogram: function(data) {
+			
+			var l = 128||data.length, i, j, real, imag, num;
+
+			for(i=0; i < l; i++ ) {
+
+				real = imag = 0;
+
+				for(j=0; j < l; j++ ) {
+					real += data[j]*Math.cos(Math.PI*i*j/l);
+					imag += data[j]*Math.sin(Math.PI*i*j/l);
+				}
+
+				num = ~~Math.abs(Math.log(Math.sqrt(real*real+imag*imag)))*100;
+				ctx.fillStyle = "hsl("+num+",50%,"+(imag*50)+"%)";
+				ctx.fillRect(scroll%W, i*H/l, 1, H/l);
+			}
+
+			scroll++;
+			return;
 		},
 
 		XSSPreventer: function() {
