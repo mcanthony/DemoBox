@@ -12,6 +12,7 @@ The current version features a (fragment) shader and synthesizer interface.
 ######Implemented
 * Fragment-Shader-Interface
 * Synthesizer-Interface
+* Sharing via base64 URL
 * Syntax-Highlighting ([ACE](https://github.com/ajaxorg/ace))
 * Time-Controls
 * Mic-Input-Support
