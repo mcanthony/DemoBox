@@ -52,7 +52,6 @@
 
 			// Register audio process and start playback
 			node.onaudioprocess = Synth.process;
-			Synth.generateThumbnail();
 
 			// Event-Listeners
 			$run.addEventListener("click", Synth.parseCode, false);
@@ -102,6 +101,8 @@
 			ctx.fillStyle = "#111";
 			ctx.strokeStyle = lineColor;
 			ctx.lineWidth = lineWidth;
+
+			Synth.generateThumbnail();
 		},
 
 		displayWave: function(sample, i) {
