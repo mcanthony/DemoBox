@@ -7,7 +7,7 @@
 	var W, H, HW, HH, timer;
 
 	var allowedVariables = ["Math", "r"];
-	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Example by Killerwolf\n\nvar lastLoPass = 0;\nvar beat = [4,2,4,2,4,6,2,6,4,2,4,6,6,2,6,4,2,6,4,6,8,4,2,4,2,4,14,4,6,2,10,2,6,6,4,6,6,2,10,2,4,2];\nvar melpitch = [4,3,3,4];\n\nfunction lopa(input, cutoff){\n	var retrn = lastLoPass + (cutoff*(input-lastLoPass)); \n	lastLoPass = retrn;\n	lastLoPass = retrn;\n	return retrn;\n}\n\nfunction f(t) {\n	return lopa(Math.sin(Math.sin(t*100*beat[~~(t*6)%42]*melpitch[~~(t*1.5)%4]))*0.6, 0.05);\n}\n";
+	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\nvar step = 512/(512*r);\nvar notes = \"CcDdEFfGgAaH\".split(\"\");\nvar melody = \"CDEFGGAAAAGAAAAGFFFFEEDDDDC\".split(\"\");\nvar beat = [4,4,4,4,2,2,4,4,4,4,1,4,4,4,4,1,4,4,4,4,2,2,4,4,4,4,1];\nvar b = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction tone(n) {  return Math.pow(Math.pow(2,1/12),n) * 440; }\n\nfunction f(t) {\n\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]));\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n    if (tt>0.95/b) { n = 0; }\n\n	return Math.sin(2*n*t);\n}";
 
 	// Settings
 	var bufferSize = 512;
