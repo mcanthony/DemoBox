@@ -52,7 +52,7 @@
 
 			// Register audio process and start playback
 			node.onaudioprocess = Synth.process;
-			Synth.togglePlayback(true);
+			Synth.generateThumbnail();
 
 			// Event-Listeners
 			$run.addEventListener("click", Synth.parseCode, false);
@@ -253,7 +253,8 @@
 
 		generateThumbnail: function() {
 			node.connect(atx.destination);
-			window.setTimeout(function() { node.disconnect(); }, 10);
+
+			window.setTimeout(function() { Synth.togglePlayback(false); }, 10);
 		},
 
 		reset: function() {

@@ -37,7 +37,7 @@
 			// Setup view, compile and run
 			Shader.canvasSetup();
 			Shader.compile();
-			Shader.togglePlayback(true);
+			Shader.togglePlayback(false);
 
 			// Register event-listeners
 			$run.addEventListener("click", Shader.compile, false);
@@ -126,7 +126,7 @@
 				Shader.frameNumber = 0;
 			}
 
-			return Math.floor(++Shader.frameNumber/interval);
+			return Math.min(Math.floor(++Shader.frameNumber/interval),60);
 		},
 
 		canvasSetup: function() {
