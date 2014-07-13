@@ -114,9 +114,10 @@
 
 		displaySpectrum: function(data) {
 
-			var l = 512, u = W/l, i, j, real, imag;
+			var l = data.length, u = W/l, i, j, real, imag;
 
 			ctx.fillStyle = "#999";
+			ctx.beginPath();
 
 			for(i=0; i < l; i++ ) {
 
@@ -124,11 +125,13 @@
 
 				for(j=0; j < l; j++ ) {
 					real += data[j]*Math.cos(Math.PI*i*j/l);
-					//imag += data[j]*Math.sin(-2*Math.PI*i*j/l);
+					//imag += data[j]*Math.sin(Math.PI*i*j/l);
 				}
 
-				ctx.fillRect(i*u,H,u*2,-Math.abs(real)*0.5);
+				ctx.rect(i*u,H,u*2,-Math.abs(real)*0.5);
 			}
+
+			ctx.fill();
 		},
 
 		XSSPreventer: function() {
