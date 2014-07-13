@@ -52,6 +52,17 @@ td {
 	box-shadow: 0px 0px 0px 2px #F00;
 }
 
+.icon {
+	background-image: url("../img/icons.svg");
+	background-repeat: no-repeat;
+	background-size: 80px 20px;
+
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+}
+
+
 .controls {
 	height: 10%;
 	padding: 10px;
@@ -60,25 +71,17 @@ td {
 	border-radius: 0px 0px 5px 5px;
 }
 
-	.shader .play-pause { background-position: -20px 0px; }
-	.play-pause, .reset {
-		background-image: url("../img/play-pause.svg");
-		background-size: 60px 20px;
-		background-repeat: no-repeat;
-
-		width: 20px;
-		height: 20px;
-		display: inline-block;
-
+	.controls .icon {
+		float: left;
 		cursor: pointer;
 		margin-top: 4px;
-		float: left;
+		margin-right: 5px;
 	}
 
-	.reset {
-		margin-right: 5px;
-		background-position: -40px 0px;
-	}
+	.play-pause { background-position: -20px 0px; }
+	.reset { background-position: -40px 0px; }
+	.mic { background-position: -60px 0px; }
+	.mic.disabled { opacity: 0.5; }
 
 	.run {
 		color: #CCC;
@@ -103,9 +106,8 @@ td {
 	.time, .fps {
 		color: #999;
 		font-weight: bold;
-		position: relative;
-		top: 8px;
-		left: 10px;
+		margin-top: 7px;
+		display: inline-block;
 	}
 
 	.fps { left: 15px; }
@@ -128,6 +130,11 @@ td {
 	white-space: pre;
 	box-sizing: border-box;
 	resize: none;
+}
+
+#shader-editor.disabled, #synthesizer-editor.disabled {
+	-webkit-filter: saturate(0) contrast(0.8);
+	filter: saturate(0) contrast(0.8);
 }
 
 .ace_scrollbar-v::-webkit-scrollbar {

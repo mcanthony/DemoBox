@@ -1,6 +1,7 @@
 ;(function(Demo, window, undefined) {
 
 	function $(str) { return document.querySelector(str); }
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 	window.f = function(){};
 	var W, H, HW, HH, timer;
@@ -20,7 +21,7 @@
 	// Interfaces
 	var ctx = $(".synthesizer canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
-	var node = atx.createScriptProcessor(bufferSize,0,2);
+	var node = atx.createScriptProcessor(bufferSize,2,2);
 	
 	// HTML-Elements
 	var $view     = $(".synthesizer td");
@@ -30,6 +31,7 @@
 	var $reset    = $(".synthesizer .reset");
 	var $run      = $(".synthesizer .run");
 	var $time     = $(".synthesizer .time");
+	var $mic      = $(".synthesizer .mic");
 
 	var Synth = Demo.Synthesizer = {
 
@@ -56,26 +58,38 @@
 			$run.addEventListener("click", Synth.parseCode, false);
 			$play.addEventListener("click", Synth.togglePlayback, false);
 			$reset.addEventListener("click", Synth.reset, false);
+			$mic.addEventListener("click", Synth.toggleMic, false);
 			window.addEventListener("resize", Synth.canvasSetup, false);
 		},
 
 		process: function(e) {
 
-			var ch0 = e.outputBuffer.getChannelData(0);
-			var ch1 = e.outputBuffer.getChannelData(1);
-			var freq = 0, current, last;
+			var freq = 0, current, last, in0, in1, out0, out1;
 
-			for (var i = 0, l = ch0.length; i < l; i++) {
+			if (Synth.micStream) {
+				in0 = e.inputBuffer.getChannelData(0);
+				in1 = e.inputBuffer.getChannelData(1);
+			}
 
-				Synth.displayWave(ch0[i]=ch1[i]=f(Synth.time+=increase),i);
+			out0 = e.outputBuffer.getChannelData(0);
+			out1 = e.outputBuffer.getChannelData(1);
+
+			for (var i = 0, l = out0.length; i < l; i++) {
+
+				if (Synth.micStream) {
+					current = in0[i];
+					Synth.displayWave(current,i);
+				} else {
+					current = out0[i];
+					Synth.displayWave(out0[i]=out1[i]=f(Synth.time+=increase),i);
+				}
 				
-				current = ch0[i];
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
 				last = current;
 			}
 
 			Synth.freq = freq;
-			Synth.displaySpectrum(ch0);
+			Synth.displaySpectrum(Synth.micStream ? in0 : out0);
 		},
 
 		canvasSetup: function() {
@@ -163,13 +177,13 @@
 			
 			// Gather all disallowed variables
 			for (key in window) {
-				if(!~allowedVariables.indexOf(key)) {
+				if (allowedVariables.indexOf(key) == -1) {
 					keys.push(key);
 				}
 			}
 
 			// Redefine them as undefined;
-			return "var " + keys.join(",") + ";"
+			return keys.length ? "var " + keys.join(",") + ";" : "";
 		},
 
 		parseCode: function(e) {
@@ -216,6 +230,25 @@
 
 			$play.setAttribute("data-status", playing ? "0" : "1");
 			$play.style.backgroundPosition = playing ? "0px 0px" : "-20px 0px";
+		},
+
+		toggleMic: function(e) {
+
+			var enabled = $mic.className.indexOf("disabled") == -1;
+
+			if (!enabled) {
+				navigator.getUserMedia({ audio: true }, function(stream) {
+					Synth.micStream = stream;
+					src = atx.createMediaStreamSource(stream).connect(node);
+					$mic.className = $mic.className.replace("disabled", "");
+					$code.className += " disabled";
+				}, function(e) { alert("Access denied"); });
+			} else {
+				Synth.micStream.stop();
+				Synth.micStream = false;
+				$mic.className += " disabled";
+				$code.className = $code.className.replace("disabled", "");
+			}
 		},
 
 		generateThumbnail: function() {
