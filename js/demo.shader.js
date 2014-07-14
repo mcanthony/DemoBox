@@ -3,7 +3,7 @@
 	var gl  = $(".shader canvas").getContext("webgl");
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;uniform float iSync;\n"
-	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from synthesizer from -1.0 to 1.0 \n * float iSync       // Current synthesizer playback time in seconds\n */\n\nvoid main()\n{\n	vec2 uv = gl_FragCoord.xy/iResolution.xy;\n	gl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
+	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from DSP from -1.0 to 1.0 \n * float iSync       // Current DSP playback time in seconds\n */\n\nvoid main()\n{\n	vec2 uv = gl_FragCoord.xy/iResolution.xy;\n	gl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
 
 	// HTML-Elements
 	var $view     = $(".shader td:first-child");
@@ -95,7 +95,7 @@
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.Synthesizer.Editor.getValue()); }
+			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.DSP.Editor.getValue()); }
 
 			var err = gl.getError();
 
