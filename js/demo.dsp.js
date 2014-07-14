@@ -10,7 +10,7 @@
 
 	// Settings
 	var bufferSize = 2048;
-	var waveSize   = 100;
+	var waveSize   = 300;
 	var lineWidth  = 5;
 	var lineColor  = "#0F9";
 	var ftcount    = 0;
@@ -78,7 +78,7 @@
 			for (var i = 0, l = out0.length; i < l; i++) {
 
 				if (DSP.micStream) { current = in0[i]; out0[i] = out1[i] = 0; }
-				else { current = out0[i] = out1[i]= f(DSP.time+=increase); }
+				else { current = out0[i] = out1[i]= f(DSP.time+=increase)*0.3; }
 
 				if (DSP.diagram == "wave") { DSP.displayWave(current,i); }
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
