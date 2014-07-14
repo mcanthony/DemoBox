@@ -10,7 +10,7 @@ The vertex shader's task is to process given vertices and map them from 3D space
 It turns out that this specific setup allows us to create astonishing 3D scenes using a simple method called raymarching or raytracing, which works as follows: For each pixel, you create an additional z-component, pushing it into the screen. From the center of the viewport (that is, our screen) we then travel in that direction, like a blind man, until we hit something. With the help of a few mathematical functions, referred to as distance functions, we can detect these collisions.
 
 The distance function for a sphere is the simplest one and looks like this:  
-`float sdSphere(vec3 position, float radius) { return length(p) - radius; }`  
+`float sdSphere(vec3 position, float radius) { return length(position) - radius; }`  
 
 Whenever this function returns a value lower than zero, we know for sure that we must be inside the sphere and we colour that pixel based on the distance travelled.
 
