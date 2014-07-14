@@ -53,7 +53,6 @@
 			// Register audio process and start playback
 			node.onaudioprocess = Synth.process;
 
-
 			// Event-Listeners
 			$run.addEventListener("click", Synth.parseCode, false);
 			$play.addEventListener("click", Synth.togglePlayback, false);
@@ -79,11 +78,9 @@
 			for (var i = 0, l = out0.length; i < l; i++) {
 
 				if (Synth.micStream) {
-					current = in0[i];
-					Synth.displayWave(current,i);
+					current = in0[i]; out0[i] = out1[i] = 0;
 				} else {
-					current = out0[i];
-					out0[i]=out1[i]=f(Synth.time+=increase);
+					current = out0[i] = out1[i]= f(Synth.time+=increase);
 				}
 
 				if (Synth.diagram == "wave") { Synth.displayWave(current,i); }
@@ -117,7 +114,7 @@
 			Synth.diagram = e.target.getAttribute("data-type");
 			e.target.parentElement.children.addClass("disabled");
 			e.target.removeClass("disabled");
-			
+
 			if (Synth.diagram == "spectrogram") {
 				ftcount = 0;
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
@@ -269,7 +266,6 @@
 
 		generateThumbnail: function() {
 			node.connect(atx.destination);
-
 			window.setTimeout(function() { Synth.togglePlayback(false); }, 10);
 		},
 
