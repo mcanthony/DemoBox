@@ -76,7 +76,7 @@ table {
 	}
 
 	.icon.disabled { opacity: 0.5; }
-	.play-pause { background-position: -20px 0px; }
+	.play-pause { background-position: 0px 0px; }
 	.reset { background-position: -40px 0px; }
 
 	.mic {
@@ -145,3 +145,23 @@ table {
 
 	.ace_scrollbar-v::-webkit-scrollbar { width: 12px; background: #333; }
 	.ace_scrollbar-v::-webkit-scrollbar-thumb { width: 6px; background: #666; }
+
+
+
+#gain {
+  -webkit-appearance: none;  
+    width: 100px;  
+    height: 10px;  
+    border: 0px;
+    background-color: #666;
+    margin-left: 10px;
+} 
+
+#gain::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	background-color: #999;
+	border: 0px;
+	width: 10px;
+	height: 20px;
+	cursor: pointer;
+}

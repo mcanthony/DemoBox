@@ -10,17 +10,21 @@
 
 	// Settings
 	var bufferSize = 2048;
-	var waveSize   = 300;
+	var waveSize   = 50;
 	var lineWidth  = 5;
 	var lineColor  = "#0F9";
 	var ftcount    = 0;
 	var sampleRate = null;
 	var increase   = null;
+	var warned     = window.localStorage.getItem("warned");
 
 	// Interfaces
 	var ctx = $(".dsp canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 	var node = atx.createScriptProcessor(bufferSize,2,2);
+	var gain = atx.createGain();
+
+	gain.gain.value = window.localStorage.getItem("gain") || 0.02;
 	
 	// HTML-Elements
 	var $view     = $(".dsp td:first-child");
@@ -31,10 +35,14 @@
 	var $run      = $(".dsp .run");
 	var $time     = $(".dsp .time");
 	var $mic      = $(".dsp .mic");
+	var $gain     = $("#gain");
+
+	$gain.value = gain.gain.value;
 
 	var DSP = Demo.DSP = {
 
 		time: 0,
+		playing: false,
 		diagram: "wave",
 
 		init: function() {
@@ -52,18 +60,22 @@
 
 			// Register audio process and start playback
 			node.onaudioprocess = DSP.process;
+			node.connect(gain);
 
 			// Event-Listeners
 			$run.addEventListener("click", DSP.parseCode, false);
 			$play.addEventListener("click", DSP.togglePlayback, false);
 			$reset.addEventListener("click", DSP.reset, false);
 			$mic.addEventListener("click", DSP.toggleMic, false);
+			$gain.addEventListener("change", DSP.gainSlider, false);
 			window.addEventListener("resize", DSP.canvasSetup, false);
 			
 			$(".diagram-controls span").on("click", DSP.toggleDiagram);
 		},
 
 		process: function(e) {
+
+			if (!DSP.playing) { return; }
 
 			var freq = 0, current, last, in0, in1, out0, out1;
 
@@ -78,7 +90,7 @@
 			for (var i = 0, l = out0.length; i < l; i++) {
 
 				if (DSP.micStream) { current = in0[i]; out0[i] = out1[i] = 0; }
-				else { current = out0[i] = out1[i]= f(DSP.time+=increase)*0.3; }
+				else { current = out0[i] = out1[i]= f(DSP.time+=increase); }
 
 				if (DSP.diagram == "wave") { DSP.displayWave(current,i); }
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
@@ -230,21 +242,27 @@
 		},
 
 		togglePlayback: function(e) {
-			var playing;
 
-			if (typeof e == "boolean") { playing = !e; }
-			else { playing = e && e.target.getAttribute("data-status") == "1"; }
-
-			if (!playing) {
-				timer = window.setInterval(DSP.updateInfo, 100);
-				node.connect(atx.destination);
-			} else {
-				window.clearInterval(timer);
-				node.disconnect();
+			if (!warned) {
+				if (confirm("The playback volume currently varies greatly from system to system. Please turn your speakers down before continuing."))
+				{ warned = true; window.localStorage.setItem("warned", "true"); }
+				else { return; }
 			}
 
-			$play.setAttribute("data-status", playing ? "0" : "1");
-			$play.style.backgroundPosition = playing ? "0px 0px" : "-20px 0px";
+			DSP.playing = typeof e == "object" ? !DSP.playing : e;
+
+			if (DSP.playing) {
+
+				timer = window.setInterval(DSP.updateInfo, 100);
+				gain.connect(atx.destination);
+
+			} else {
+				window.clearInterval(timer);
+				gain.disconnect();
+			}
+
+			$play.setAttribute("data-status", DSP.playing ? "1" : "0");
+			$play.style.backgroundPosition = DSP.playing ? "-20px 0px" : "0px 0px";
 		},
 
 		toggleMic: function(e) {
@@ -267,8 +285,19 @@
 		},
 
 		generateThumbnail: function() {
-			node.connect(atx.destination);
-			window.setTimeout(function() { DSP.togglePlayback(false); }, 10);
+
+			var playState = DSP.playing;
+			DSP.playing = true;
+
+			var gainVal = gain.gain.value;
+			gain.gain.value = 0;
+
+			gain.connect(atx.destination);
+			window.setTimeout(function() {
+				if (!playState) { gain.disconnect(); }
+				gain.gain.value = gainVal;
+				DSP.playing = playState;
+			}, 100);
 		},
 
 		reset: function() {
@@ -302,6 +331,12 @@
 			else { DSP.Editor.setValue(atob(Demo.base64[1])); }
 
 			DSP.Editor.gotoLine(0);
+		},
+
+		gainSlider: function(e) {
+			var val = e.target.value;
+			gain.gain.value = val;
+			window.localStorage.setItem("gain", val);
 		}
 	};
 
