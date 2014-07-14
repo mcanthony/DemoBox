@@ -135,7 +135,7 @@ td {
 
 	.fps { left: 15px; }
 
-#shader-editor, #synthesizer-editor {
+#shader-editor, #dsp-editor {
 	color: #FFF;
 	font-size: 12px;
 	line-height: 16px;
@@ -155,7 +155,7 @@ td {
 	resize: none;
 }
 
-#shader-editor.disabled, #synthesizer-editor.disabled {
+#shader-editor.disabled, #dsp-editor.disabled {
 	-webkit-filter: saturate(0) contrast(0.8);
 	filter: saturate(0) contrast(0.8);
 }

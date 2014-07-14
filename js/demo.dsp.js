@@ -6,7 +6,7 @@
 	var W, H, HW, HH, timer;
 
 	var allowedVariables = ["Math", "r"];
-	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Too complex? Try something simple:\n// function f(t) { return Math.sin(2 * Math.PI * 440 * t); }\n\nvar beat   = 1/4;\nvar step   = 512/(512*r)/beat;\nvar notes  = \"CcDdEFfGgAaH\".split(\"\");\n\nvar melody = \"ADFADFAC-GFGADCED\".split(\"\");\nvar beat   = [1,2,1,2];\nvar b      = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction f(t) {\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]), 2);\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n	return !n?0:Math.sin(2*n*t)>0?0.2:-0.2;\n}\n\nfunction tone(n,octave) { return n==-1?0:Math.pow(Math.pow(2,1/12),n) * 440 * octave; }";
+	var example = "/**\n * DSP (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Too complex? Try something simple:\n// function f(t) { return Math.sin(2 * Math.PI * 440 * t); }\n\nvar beat   = 1/4;\nvar step   = 512/(512*r)/beat;\nvar notes  = \"CcDdEFfGgAaH\".split(\"\");\n\nvar melody = \"ADFADFAC-GFGADCED\".split(\"\");\nvar beat   = [1,2,1,2];\nvar b      = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction f(t) {\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]), 2);\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n	return !n?0:Math.sin(2*n*t)>0?0.2:-0.2;\n}\n\nfunction tone(n,octave) { return n==-1?0:Math.pow(Math.pow(2,1/12),n) * 440 * octave; }";
 
 	// Settings
 	var bufferSize = 2048;
@@ -18,21 +18,21 @@
 	var ftcount = 0;
 
 	// Interfaces
-	var ctx = $(".synthesizer canvas").getContext("2d");
+	var ctx = $(".dsp canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 	var node = atx.createScriptProcessor(bufferSize,2,2);
 	
 	// HTML-Elements
-	var $view     = $(".synthesizer td:first-child");
-	var $codeView = $(".synthesizer .code-view");
-	var $code     = $("#synthesizer-editor");
-	var $play     = $(".synthesizer .play-pause");
-	var $reset    = $(".synthesizer .reset");
-	var $run      = $(".synthesizer .run");
-	var $time     = $(".synthesizer .time");
-	var $mic      = $(".synthesizer .mic");
+	var $view     = $(".dsp td:first-child");
+	var $codeView = $(".dsp .code-view");
+	var $code     = $("#dsp-editor");
+	var $play     = $(".dsp .play-pause");
+	var $reset    = $(".dsp .reset");
+	var $run      = $(".dsp .run");
+	var $time     = $(".dsp .time");
+	var $mic      = $(".dsp .mic");
 
-	var Synth = Demo.Synthesizer = {
+	var DSP = Demo.DSP = {
 
 		time: 0,
 		diagram: "wave",
@@ -40,34 +40,34 @@
 		init: function() {
 
 			// Setup Ace-Editor
-			Synth.setupEditor();
+			DSP.setupEditor();
 
 			// Set system specific variables
 			sampleRate = atx.sampleRate;
 			increase = bufferSize/(sampleRate*bufferSize);
 
 			// Parse code and setup canvas
-			Synth.parseCode();
-			Synth.canvasSetup();
+			DSP.parseCode();
+			DSP.canvasSetup();
 
 			// Register audio process and start playback
-			node.onaudioprocess = Synth.process;
+			node.onaudioprocess = DSP.process;
 
 			// Event-Listeners
-			$run.addEventListener("click", Synth.parseCode, false);
-			$play.addEventListener("click", Synth.togglePlayback, false);
-			$reset.addEventListener("click", Synth.reset, false);
-			$mic.addEventListener("click", Synth.toggleMic, false);
-			window.addEventListener("resize", Synth.canvasSetup, false);
+			$run.addEventListener("click", DSP.parseCode, false);
+			$play.addEventListener("click", DSP.togglePlayback, false);
+			$reset.addEventListener("click", DSP.reset, false);
+			$mic.addEventListener("click", DSP.toggleMic, false);
+			window.addEventListener("resize", DSP.canvasSetup, false);
 			
-			$(".diagram-controls span").on("click", Synth.toggleDiagram);
+			$(".diagram-controls span").on("click", DSP.toggleDiagram);
 		},
 
 		process: function(e) {
 
 			var freq = 0, current, last, in0, in1, out0, out1;
 
-			if (Synth.micStream) {
+			if (DSP.micStream) {
 				in0 = e.inputBuffer.getChannelData(0);
 				in1 = e.inputBuffer.getChannelData(1);
 			}
@@ -77,22 +77,22 @@
 
 			for (var i = 0, l = out0.length; i < l; i++) {
 
-				if (Synth.micStream) {
+				if (DSP.micStream) {
 					current = in0[i]; out0[i] = out1[i] = 0;
 				} else {
-					current = out0[i] = out1[i]= f(Synth.time+=increase);
+					current = out0[i] = out1[i]= f(DSP.time+=increase);
 				}
 
-				if (Synth.diagram == "wave") { Synth.displayWave(current,i); }
+				if (DSP.diagram == "wave") { DSP.displayWave(current,i); }
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
 
 				last = current;
 			}
 
-			if (Synth.diagram == "spectrum") { Synth.displaySpectrum(Synth.micStream ? in0 : out0); }
-			if (Synth.diagram == "spectrogram") { Synth.displaySpectrogram(Synth.micStream ? in0 : out0); }
+			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
+			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
 
-			Synth.freq = freq;
+			DSP.freq = freq;
 		},
 
 		canvasSetup: function() {
@@ -106,16 +106,16 @@
 			ctx.strokeStyle = lineColor;
 			ctx.lineWidth = lineWidth;
 
-			Synth.generateThumbnail();
+			DSP.generateThumbnail();
 		},
 
 		toggleDiagram: function(e) {
 
-			Synth.diagram = e.target.getAttribute("data-type");
+			DSP.diagram = e.target.getAttribute("data-type");
 			e.target.parentElement.children.addClass("disabled");
 			e.target.removeClass("disabled");
 
-			if (Synth.diagram == "spectrogram") {
+			if (DSP.diagram == "spectrogram") {
 				ftcount = 0;
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 			}
@@ -128,8 +128,8 @@
 
 			if (i==0) {
 
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,Synth.freq);
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSync,Synth.time);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,DSP.freq);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSync,DSP.time);
 
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
@@ -201,21 +201,21 @@
 
 		parseCode: function(e) {
 
-			// Listen for nested errors which try-catch can'Synth.time find
-			window.onerror = Synth.error;
-			var codeValue = Synth.Editor.getValue();
+			// Listen for nested errors which try-catch can'DSP.time find
+			window.onerror = DSP.error;
+			var codeValue = DSP.Editor.getValue();
 
 			// Remove error class
 			$codeView.className = $codeView.className.replace("error", "");
 
 			// Remove the previous script
-			var $script = $("#synthesizer-script");
+			var $script = $("#dsp-script");
 			if ($script) { $script.remove(); }
 
 			// Create new script and safely insert the code
 			$script           = document.createElement("script");
-			$script.id        = "synthesizer-script";
-			$script.innerHTML = "try{window.f=function(r){"+Synth.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){Synth.error(e)}";
+			$script.id        = "dsp-script";
+			$script.innerHTML = "try{window.f=function(r){"+DSP.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){DSP.error(e)}";
 
 			// Update the URL hash if the code was parsed due to a user event
 			if (e) { window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); }
@@ -234,7 +234,7 @@
 			else { playing = e && e.target.getAttribute("data-status") == "1"; }
 
 			if (!playing) {
-				timer = window.setInterval(Synth.updateInfo, 100);
+				timer = window.setInterval(DSP.updateInfo, 100);
 				node.connect(atx.destination);
 			} else {
 				window.clearInterval(timer);
@@ -251,14 +251,14 @@
 
 			if (!enabled) {
 				navigator.getUserMedia({ audio: true }, function(stream) {
-					Synth.micStream = stream;
+					DSP.micStream = stream;
 					src = atx.createMediaStreamSource(stream).connect(node);
 					$mic.className = $mic.className.replace("disabled", "");
 					$code.className += " disabled";
 				}, function(e) { alert("Access denied"); });
 			} else {
-				Synth.micStream.stop();
-				Synth.micStream = false;
+				DSP.micStream.stop();
+				DSP.micStream = false;
 				$mic.className += " disabled";
 				$code.className = $code.className.replace("disabled", "");
 			}
@@ -266,11 +266,11 @@
 
 		generateThumbnail: function() {
 			node.connect(atx.destination);
-			window.setTimeout(function() { Synth.togglePlayback(false); }, 10);
+			window.setTimeout(function() { DSP.togglePlayback(false); }, 10);
 		},
 
 		reset: function() {
-			$time.innerHTML = "0.00"; Synth.time = 0;
+			$time.innerHTML = "0.00"; DSP.time = 0;
 		},
 
 		error: function(e) {
@@ -278,28 +278,28 @@
 		},
 
 		updateInfo: function() {
-			$time.innerHTML = ((Synth.time*(1/increase))/sampleRate).toFixed(2);
+			$time.innerHTML = ((DSP.time*(1/increase))/sampleRate).toFixed(2);
 		},
 
 		setupEditor: function() {
 
-			Synth.Editor = ace.edit("synthesizer-editor");
-			Synth.Editor.setTheme("ace/theme/monokai");
-			Synth.Editor.getSession().setMode("ace/mode/javascript");
-			Synth.Editor.setShowPrintMargin(false);
-			Synth.Editor.getSession().setUseWrapMode(true);
+			DSP.Editor = ace.edit("dsp-editor");
+			DSP.Editor.setTheme("ace/theme/monokai");
+			DSP.Editor.getSession().setMode("ace/mode/javascript");
+			DSP.Editor.setShowPrintMargin(false);
+			DSP.Editor.getSession().setUseWrapMode(true);
 
-			Synth.Editor.commands.addCommand({
+			DSP.Editor.commands.addCommand({
 				name: 'compile',
 				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
-				exec: Synth.parseCode
+				exec: DSP.parseCode
 			});
 
 			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { Synth.Editor.setValue(example); }
-			else { Synth.Editor.setValue(atob(Demo.base64[1])); }
+			if (Demo.base64.length==1) { DSP.Editor.setValue(example); }
+			else { DSP.Editor.setValue(atob(Demo.base64[1])); }
 
-			Synth.Editor.gotoLine(0);
+			DSP.Editor.gotoLine(0);
 		}
 	};
 

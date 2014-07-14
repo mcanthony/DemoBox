@@ -14,7 +14,7 @@ The distance function for a sphere is the simplest one and looks like this:
 
 Whenever this function returns a value lower than zero, we know for sure that we must be inside the sphere and we colour that pixel based on the distance travelled.
 
-##The Audio Processor Interface
+##The DSP Interface
 
 For the audio processor interface we take advantage of JavaScript's [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext). Don't worry if most of these functions look unfamiliar to you, all you need to know to begin programming music are the fundamentals of soundwaves (and some JavaScript).
 

@@ -3,6 +3,6 @@
 	Demo.base64 = window.location.hash.substr(1).split(";");
 
 	Demo.Shader.init();
-	Demo.Synthesizer.init();
+	Demo.DSP.init();
 
 }(window.Demo || (window.Demo = {}), window));
