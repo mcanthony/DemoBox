@@ -9,50 +9,26 @@ html {
 	background-color: #000;
 }
 
-#author {
-	color: #666;
-
-	height: 0px;
-	width: 0px;
-
-	
-	display: block;
-	display: none;
-	white-space: nowrap;
-}
-
-#author a { color: #669;}
-
 canvas {
 	display: block;
 	border-radius: 5px;
 }
 
 table {
-	width: 100%;
-	height: 100%;
+	width: 100%; height: 100%;
 	border-spacing: 10px;
 	table-layout: fixed;
 }
 
-table td {
-	position: relative;
-}
+	td {
+		position: relative;
+		width: 50%;
+		height: 50%;
+		vertical-align: top;
+	}
 
-td {
-	width: 50%;
-	height: 50%;
-	vertical-align: top;
-}
-
-.code-view {
-	width: 100%;
-	height: 100%;
-}
-
-.code-view.error {
-	box-shadow: 0px 0px 0px 2px #F00;
-}
+.code-view { width: 100%; height: 100%; }
+.code-view.error { box-shadow: 0px 0px 0px 2px #F00; }
 
 .icon {
 	background-image: url("../img/icons.svg");
@@ -99,6 +75,7 @@ td {
 		margin-right: 5px;
 	}
 
+	.icon.disabled { opacity: 0.5; }
 	.play-pause { background-position: -20px 0px; }
 	.reset { background-position: -40px 0px; }
 
@@ -107,8 +84,6 @@ td {
 		float: right !important;
 		margin-right: 10px !important;
 	}
-
-	.icon.disabled { opacity: 0.5; }
 
 	.run {
 		color: #CCC;
@@ -151,7 +126,10 @@ td {
 	width: 100%;
 
 	border: 0px;
+	border-radius: 5px 5px 0px 0px;
+
 	padding: 20px;
+	padding-top: 10px;
 
 	display: block;
 	overflow-x: auto;
@@ -160,22 +138,10 @@ td {
 	resize: none;
 }
 
-#shader-editor.disabled, #dsp-editor.disabled {
-	-webkit-filter: saturate(0) contrast(0.8);
-	filter: saturate(0) contrast(0.8);
-}
+	#shader-editor.disabled, #dsp-editor.disabled {
+		-webkit-filter: saturate(0) contrast(0.8);
+		filter: saturate(0) contrast(0.8);
+	}
 
-.ace_scrollbar-v::-webkit-scrollbar {
-	width: 12px;
-	background: #333;
-}
-
-.ace_scrollbar-v::-webkit-scrollbar-thumb {
-	width: 6px;
-	background: #666;
-}
-
-.editor {
-	padding-top: 10px;
-	border-radius: 5px 5px 0px 0px;
-}
+	.ace_scrollbar-v::-webkit-scrollbar { width: 12px; background: #333; }
+	.ace_scrollbar-v::-webkit-scrollbar-thumb { width: 6px; background: #666; }
