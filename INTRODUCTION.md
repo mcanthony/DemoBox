@@ -9,7 +9,11 @@ The vertex shader's task is to process given vertices and map them from 3D space
 
 Since we want to keep things as simple as possible all the calculation is done in the fragment shader. The pixel coordinates come from a predefined simple square (it's actually two triangles) which covers the whole viewport in the vertex shader. In the default example, the produced image is a simple, coloured gradient based on the coordinate of each individual pixel.
 
-It turns out that this specific setup allows us to create astonishing 3D scenes using a simple method called raymarching or raytracing which works as follows: For each pixel, you create an additional z-component, pushing it into the screen. From the center of the viewport (that is, out screen) we then travel in that direction, like a blind man until we hit something. With the help of a few mathematical functions, referred to as distance functions, we can detect these collisions. The distance function for a sphere is the simplest one and looks like this in pseudo-code `float sdSphere(vec3 position, float radius) { return length(p) - r; }` Whenever this function returns a value lower than zero, we know for sure that we must be inside the sphere and we colour that pixel based on the distance we travelled.
+It turns out that this specific setup allows us to create astonishing 3D scenes using a simple method called raymarching or raytracing which works as follows: For each pixel, you create an additional z-component, pushing it into the screen. From the center of the viewport (that is, out screen) we then travel in that direction, like a blind man until we hit something. With the help of a few mathematical functions, referred to as distance functions, we can detect these collisions.
+
+The distance function for a sphere is the simplest one and looks like this: `float sdSphere(vec3 position, float radius) { return length(p) - radius; }`  
+
+Whenever this function returns a value lower than zero, we know for sure that we must be inside the sphere and we colour that pixel based on the distance we travelled.
 
 ##The Audio Processor Interface
 
