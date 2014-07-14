@@ -180,7 +180,7 @@
 				val = ~~(10 * Math.log(real*real+imag*imag)+170);
 
 				ctx.fillStyle = "hsl("+val+",80%,50%)";
-				ctx.fillRect(ftcount%W, ~~(i*(l/(i+15))*H/l), 1, ~~((l/(i+15))*H/l+1));
+				ctx.fillRect(ftcount%W, ~~(i*(l/(i+15))*H/l)*0.95, 1, ~~((l/(i+15))*H/l+1));
 			}
 
 			ftcount++;
