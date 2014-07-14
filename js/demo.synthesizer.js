@@ -1,6 +1,5 @@
 ;(function(Demo, window, undefined) {
 
-	function $(str) { return document.querySelector(str); }
 	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 	window.f = function(){};
@@ -10,13 +9,13 @@
 	var example = "/**\n * Synthesizer (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Too complex? Try something simple:\n// function f(t) { return Math.sin(2 * Math.PI * 440 * t); }\n\nvar beat   = 1/4;\nvar step   = 512/(512*r)/beat;\nvar notes  = \"CcDdEFfGgAaH\".split(\"\");\n\nvar melody = \"ADFADFAC-GFGADCED\".split(\"\");\nvar beat   = [1,2,1,2];\nvar b      = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction f(t) {\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]), 2);\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n	return !n?0:Math.sin(2*n*t)>0?0.2:-0.2;\n}\n\nfunction tone(n,octave) { return n==-1?0:Math.pow(Math.pow(2,1/12),n) * 440 * octave; }";
 
 	// Settings
-	var bufferSize = 512;
+	var bufferSize = 2048;
 	var waveSize = 100;
 	var lineWidth = 5;
 	var lineColor = "#0F9";
 	var sampleRate;
 	var increase;
-	var scroll = 0;
+	var ftcount = 0;
 
 	// Interfaces
 	var ctx = $(".synthesizer canvas").getContext("2d");
@@ -24,7 +23,7 @@
 	var node = atx.createScriptProcessor(bufferSize,2,2);
 	
 	// HTML-Elements
-	var $view     = $(".synthesizer td");
+	var $view     = $(".synthesizer td:first-child");
 	var $codeView = $(".synthesizer .code-view");
 	var $code     = $("#synthesizer-editor");
 	var $play     = $(".synthesizer .play-pause");
@@ -36,6 +35,7 @@
 	var Synth = Demo.Synthesizer = {
 
 		time: 0,
+		diagram: "wave",
 
 		init: function() {
 
@@ -53,12 +53,15 @@
 			// Register audio process and start playback
 			node.onaudioprocess = Synth.process;
 
+
 			// Event-Listeners
 			$run.addEventListener("click", Synth.parseCode, false);
 			$play.addEventListener("click", Synth.togglePlayback, false);
 			$reset.addEventListener("click", Synth.reset, false);
 			$mic.addEventListener("click", Synth.toggleMic, false);
 			window.addEventListener("resize", Synth.canvasSetup, false);
+			
+			$(".diagram-controls span").on("click", Synth.toggleDiagram);
 		},
 
 		process: function(e) {
@@ -80,15 +83,19 @@
 					Synth.displayWave(current,i);
 				} else {
 					current = out0[i];
-					Synth.displayWave(out0[i]=out1[i]=f(Synth.time+=increase),i);
+					out0[i]=out1[i]=f(Synth.time+=increase);
 				}
-				
+
+				if (Synth.diagram == "wave") { Synth.displayWave(current,i); }
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
+
 				last = current;
 			}
 
+			if (Synth.diagram == "spectrum") { Synth.displaySpectrum(Synth.micStream ? in0 : out0); }
+			if (Synth.diagram == "spectrogram") { Synth.displaySpectrogram(Synth.micStream ? in0 : out0); }
+
 			Synth.freq = freq;
-			Synth.displaySpectrum(Synth.micStream ? in0 : out0);
 		},
 
 		canvasSetup: function() {
@@ -105,12 +112,22 @@
 			Synth.generateThumbnail();
 		},
 
+		toggleDiagram: function(e) {
+
+			Synth.diagram = e.target.getAttribute("data-type");
+			e.target.parentElement.children.addClass("disabled");
+			e.target.removeClass("disabled");
+			
+			if (Synth.diagram == "spectrogram") {
+				ftcount = 0;
+				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
+			}
+		},
+
 		displayWave: function(sample, i) {
 
 			var x = (i/bufferSize)*W;
 			var y = sample*waveSize+HH;
-
-			var frequencies
 
 			if (i==0) {
 
@@ -130,9 +147,10 @@
 
 		displaySpectrum: function(data) {
 
-			var l = data.length, u = W/l, i, j, real, imag;
+			var l = 512, u = W/l, i, j, real, imag;
 
-			ctx.fillStyle = "#999";
+			ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
+			ctx.fillStyle = lineColor;
 			ctx.beginPath();
 
 			for(i=0; i < l; i++ ) {
@@ -144,32 +162,29 @@
 					//imag += data[j]*Math.sin(Math.PI*i*j/l);
 				}
 
-				ctx.rect(i*u,H,u*2,-Math.abs(real)*0.5);
+				ctx.rect(i*u,HH,u*2,-Math.abs(real));
 			}
 
 			ctx.fill();
 		},
 
-		displaySpectogram: function(data) {
+		displaySpectrogram: function(data) {
 			
-			var l = 128||data.length, i, j, real, imag, num;
+			var l = 512, con = -2*Math.PI/l, i, j, b, real, imag, num;
 
-			for(i=0; i < l; i++ ) {
-
+			for(i=0; i < l/2; i++ ) {
 				real = imag = 0;
-
 				for(j=0; j < l; j++ ) {
-					real += data[j]*Math.cos(Math.PI*i*j/l);
-					imag += data[j]*Math.sin(Math.PI*i*j/l);
+					b = con*i*j;
+					real += data[j]*Math.cos(b);
+					imag += data[j]*Math.sin(b);
 				}
-
-				num = ~~Math.abs(Math.log(Math.sqrt(real*real+imag*imag)))*100;
-				ctx.fillStyle = "hsl("+num+",50%,"+(imag*50)+"%)";
-				ctx.fillRect(scroll%W, i*H/l, 1, H/l);
+				num = ~~(10 * Math.log(real*real+imag*imag)+170);
+				ctx.fillStyle = "hsl("+num+",80%,50%)";
+				ctx.fillRect(ftcount%W, ~~(i*(l/(i+15))*H/l), 1, ~~((l/(i+15))*H/l+1));// log size
 			}
 
-			scroll++;
-			return;
+			ftcount++;
 		},
 
 		XSSPreventer: function() {

@@ -23,7 +23,15 @@
 				</td>
 			</tr>
 			<tr class="synthesizer">
-				<td><canvas></canvas></td>
+				<td>
+					<canvas></canvas>
+
+					<div class="diagram-controls">
+						<span class="icon diagram" data-type="wave"></span>
+						<span class="icon diagram disabled" data-type="spectrum"></span>
+						<span class="icon diagram disabled" data-type="spectrogram"></span>
+					</div>
+				</td>
 				<td>
 					<div class="code-view">
 						<div class="editor" id="synthesizer-editor" spellcheck="false"></div>
@@ -42,6 +50,7 @@
 		<span id="author">&copy; 2014 Elias Schütt - <a href="https://github.com/elias94xx/HTML5-Demo-Tool">GitHub Repository</a></span>
 
 		<script src="js/ace/ace.js"></script>
+		<script src="js/demo.utils.js"></script>
 		<script src="js/demo.shader.js"></script>
 		<script src="js/demo.synthesizer.js"></script>
 		<script src="js/demo.js"></script>

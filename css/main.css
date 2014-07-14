@@ -37,6 +37,10 @@ table {
 	table-layout: fixed;
 }
 
+table td {
+	position: relative;
+}
+
 td {
 	width: 50%;
 	height: 50%;
@@ -55,13 +59,32 @@ td {
 .icon {
 	background-image: url("../img/icons.svg");
 	background-repeat: no-repeat;
-	background-size: 80px 20px;
+	background-size: 140px 20px;
 
 	width: 20px;
 	height: 20px;
 	display: inline-block;
 }
 
+.diagram-controls {
+	position: absolute;
+	bottom: 5px; left: 10px;
+}
+
+	.diagram-controls span {
+		float: left;
+		margin-right: 10px;
+		cursor: pointer;
+
+		background-size: 224px 32px;
+
+		width: 32px;
+		height: 32px;
+	}
+
+	span[data-type=wave] { background-position: -128px 0px; }
+	span[data-type=spectrum] { background-position: -160px 0px; }
+	span[data-type=spectrogram] { background-position: -192px 0px; }
 
 .controls {
 	height: 10%;
@@ -81,7 +104,7 @@ td {
 	.play-pause { background-position: -20px 0px; }
 	.reset { background-position: -40px 0px; }
 	.mic { background-position: -60px 0px; }
-	.mic.disabled { opacity: 0.5; }
+	.icon.disabled { opacity: 0.5; }
 
 	.run {
 		color: #CCC;
