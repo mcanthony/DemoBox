@@ -101,7 +101,13 @@ td {
 
 	.play-pause { background-position: -20px 0px; }
 	.reset { background-position: -40px 0px; }
-	.mic { background-position: -60px 0px; }
+
+	.mic {
+		background-position: -60px 0px;
+		float: right !important;
+		margin-right: 10px !important;
+	}
+
 	.icon.disabled { opacity: 0.5; }
 
 	.run {
@@ -127,11 +133,12 @@ td {
 	.time, .fps {
 		color: #999;
 		font-weight: bold;
-		margin-top: 7px;
+		margin-top: 8px;
+		margin-left: 8px;
 		display: inline-block;
 	}
 
-	.fps { left: 15px; }
+	.fps { float: right; margin-right: 15px; }
 
 #shader-editor, #dsp-editor {
 	color: #FFF;
