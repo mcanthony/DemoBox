@@ -24,7 +24,7 @@ Let's continue by defining the two basic properties of a sound wave: **amplitude
 
 The frequency of a sound wave corresponds to the amount of cycles it performs each seconds. These cycles, also called periods, are measured in Hertz (Hz). An unmodulated sine wave for example has a period of 2π. We humans relate the frequency of a sound wave to what we call "pitch".
 
-With that basic knowledge, we can now start programming music! In the audio processor interface, all we have to do is define a function `f(t)` returning a value form -1 to 1.
+With that basic knowledge, we can now start programming music! In the audio processor interface, all we have to do is define a function `f(t)` returning a value form -1 to 1. The parameter `t` is a floating number representing the current time in seconds. Thus, the return value of `f` directly defines the amplitude at that point in time.
 
 Creating the musical note A<sub>4</sub> is as simple as:  
 `function f(t) { return Math.sin(2 * Math.PI  * 440 * t); }`
