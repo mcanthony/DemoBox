@@ -3,7 +3,7 @@
 	var gl  = $(".shader canvas").getContext("webgl");
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;uniform float iSync;\n"
-	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from DSP from -1.0 to 1.0 \n * float iSync       // Current DSP playback time in seconds\n */\n\nvoid main()\n{\n	vec2 uv = gl_FragCoord.xy/iResolution.xy;\n	gl_FragColor = vec4(uv,(sin(iGlobalTime)+1.0)/2.0,1.0);\n}";
+	var fsc = "/**\n * Fragment-Shader (OpenGL ES 2.0)\n *  \n * vec2  iResolution // canvas resolution in pixels\n * float iGlobalTime // playback time in seconds\n * float iSample     // Current sample value from DSP from -1.0 to 1.0 \n * float iSync       // Current DSP playback time in seconds\n */\n\n#define N 100.0 // Iterations\n#define Z   2.0 // Zoom\n#define M false // Mandelbrot\n\nvoid main()\n{\n	vec3 d = vec3(1); vec2 c = vec2(-0.79,0.2);\n	vec2 z = (2.0 * gl_FragCoord.xy - iResolution.xy) / iResolution.xx * Z;\n	if (M) { c = z; z = vec2(0); }\n\n	for(float i=0.0;i<N;i+=1.0)\n	{\n		z = vec2(z.x*z.x-z.y*z.y,2.0*z.x*z.y)+c;\n		if (length(z)>2.0) { d = vec3(i/N)*vec3(z,N/5.0); break; }\n	}\n	\n	gl_FragColor = vec4(d*1.5,1.0);\n}";
 
 	// HTML-Elements
 	var $view     = $(".shader td:first-child");
