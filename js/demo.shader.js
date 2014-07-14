@@ -36,6 +36,7 @@
 			Shader.canvasSetup();
 			Shader.compile();
 			Shader.togglePlayback(false);
+			Shader.pauseTime = 0;
 
 			// Register event-listeners
 			$run.addEventListener("click", Shader.compile, false);
