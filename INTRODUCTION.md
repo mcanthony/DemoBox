@@ -30,4 +30,4 @@ With that basic knowledge we can now start programming music! In the audio proce
 Creating the musical note A<sub>4</sub> is as simple as:  
 `function f(t) { return Math.sin(2 * Math.PI  * 440 * t); }`
 
-With `2 * Math.PI` being the wave length and `440` the specific frequency. 
+With `2 * Math.PI` turning the wavelength to 1 and `440` the specific frequency. 
