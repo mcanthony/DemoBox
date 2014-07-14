@@ -234,7 +234,7 @@
 			else { playing = e && e.target.getAttribute("data-status") == "1"; }
 
 			if (!playing) {
-				timer = window.setInterval(function() { $time.innerHTML = ((Synth.time*(1/increase))/sampleRate).toFixed(2); }, 100);
+				timer = window.setInterval(Synth.updateInfo, 100);
 				node.connect(atx.destination);
 			} else {
 				window.clearInterval(timer);
@@ -275,6 +275,10 @@
 
 		error: function(e) {
 			$codeView.className += " error";
+		},
+
+		updateInfo: function() {
+			$time.innerHTML = ((Synth.time*(1/increase))/sampleRate).toFixed(2);
 		},
 
 		setupEditor: function() {
