@@ -6,16 +6,16 @@
 	var W, H, HW, HH, timer;
 
 	var allowedVariables = ["Math", "r"];
-	var example = "/**\n * DSP (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate\n */\n\n// Too complex? Try something simple:\n// function f(t) { return Math.sin(2 * Math.PI * 440 * t); }\n\nvar beat   = 1/4;\nvar step   = 512/(512*r)/beat;\nvar notes  = \"CcDdEFfGgAaH\".split(\"\");\n\nvar melody = \"ADFADFAC-GFGADCED\".split(\"\");\nvar beat   = [1,2,1,2];\nvar b      = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction f(t) {\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]), 2);\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n	return !n?0:Math.sin(2*n*t)>0?0.2:-0.2;\n}\n\nfunction tone(n,octave) { return n==-1?0:Math.pow(Math.pow(2,1/12),n) * 440 * octave; }";
+	var example = "/**\n * DSP (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate in Hertz\n */\n\n// Too complex? Try something simple:\n// function f(t) { return Math.sin(2 * Math.PI * 440 * t); }\n\nvar beat   = 1/4;\nvar step   = 512/(512*r)/beat;\nvar notes  = \"CcDdEFfGgAaH\".split(\"\");\n\nvar melody = \"ADFADFAC-GFGADCED\".split(\"\");\nvar beat   = [1,2,1,2];\nvar b      = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction f(t) {\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]), 2);\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n	return !n?0:Math.sin(2*n*t)>0?0.2:-0.2;\n}\n\nfunction tone(n,octave) { return n==-1?0:Math.pow(Math.pow(2,1/12),n) * 440 * octave; }";
 
 	// Settings
 	var bufferSize = 2048;
-	var waveSize = 100;
-	var lineWidth = 5;
-	var lineColor = "#0F9";
-	var sampleRate;
-	var increase;
-	var ftcount = 0;
+	var waveSize   = 100;
+	var lineWidth  = 5;
+	var lineColor  = "#0F9";
+	var ftcount    = 0;
+	var sampleRate = null;
+	var increase   = null;
 
 	// Interfaces
 	var ctx = $(".dsp canvas").getContext("2d");
@@ -77,11 +77,8 @@
 
 			for (var i = 0, l = out0.length; i < l; i++) {
 
-				if (DSP.micStream) {
-					current = in0[i]; out0[i] = out1[i] = 0;
-				} else {
-					current = out0[i] = out1[i]= f(DSP.time+=increase);
-				}
+				if (DSP.micStream) { current = in0[i]; out0[i] = out1[i] = 0; }
+				else { current = out0[i] = out1[i]= f(DSP.time+=increase); }
 
 				if (DSP.diagram == "wave") { DSP.displayWave(current,i); }
 				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
@@ -133,6 +130,7 @@
 
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
+
 				ctx.beginPath(); ctx.moveTo(x,y);
 				return;
 			}
@@ -150,7 +148,7 @@
 			ctx.fillStyle = lineColor;
 			ctx.beginPath();
 
-			for(i=0; i < l; i++ ) {
+			for(i = 0; i < l; i++) {
 
 				real = imag = 0;
 
@@ -167,18 +165,22 @@
 
 		displaySpectrogram: function(data) {
 			
-			var l = 512, con = -2*Math.PI/l, i, j, b, real, imag, num;
+			var l = 512, con = -2*Math.PI/l, i, j, b, real, imag, val;
 
-			for(i=0; i < l/2; i++ ) {
+			for(i = 0; i < l/2; i++) {
+
 				real = imag = 0;
-				for(j=0; j < l; j++ ) {
-					b = con*i*j;
-					real += data[j]*Math.cos(b);
+
+				for(j= 0 ; j < l; j++) {
+
+					real += data[j]*Math.cos(b = con*i*j);
 					imag += data[j]*Math.sin(b);
 				}
-				num = ~~(10 * Math.log(real*real+imag*imag)+170);
-				ctx.fillStyle = "hsl("+num+",80%,50%)";
-				ctx.fillRect(ftcount%W, ~~(i*(l/(i+15))*H/l), 1, ~~((l/(i+15))*H/l+1));// log size
+
+				val = ~~(10 * Math.log(real*real+imag*imag)+170);
+
+				ctx.fillStyle = "hsl("+val+",80%,50%)";
+				ctx.fillRect(ftcount%W, ~~(i*(l/(i+15))*H/l), 1, ~~((l/(i+15))*H/l+1));
 			}
 
 			ftcount++;
