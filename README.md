@@ -11,20 +11,19 @@ The current version features a (fragment) shader and synthesizer interface.
 
 ######Implemented
 * Fragment-Shader-Interface
-* Synthesizer-Interface
+* DSP-Interface
 * Sharing via base64 URL
 * Syntax-Highlighting ([ACE](https://github.com/ajaxorg/ace))
 * Time-Controls
 * Mic-Input-Support
 * Wave-Diagram
-* Spectrum-Diagram
+* Spectrum
+* Spectrogram
 
 ######Planned
-* Spectrogram
 * Texture-Channels
 * Fullscreen-Controls
 * GLSL-Syntax-Checking
-
 
 ##Screenshot
 
