@@ -27,4 +27,4 @@ A tool developed for creating [demos](https://en.wikipedia.org/wiki/Demo_(comput
 
 ##Screenshot
 
-![](https://i.imgur.com/265EDnr.png)
+![](https://i.imgur.com/OsNEFTq.png)
