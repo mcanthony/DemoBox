@@ -361,6 +361,7 @@
 			DSP.Editor.setValue(atob(examples[which]));
 			DSP.Editor.gotoLine(0);
 
+			DSP.time = 0;
 			DSP.parseCode();
 			DSP.generateThumbnail();
 		}
