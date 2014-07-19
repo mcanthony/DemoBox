@@ -24,10 +24,12 @@
 	// Interfaces
 	var ctx = $(".dsp canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
-	var node = atx.createScriptProcessor(bufferSize,2,2);
-	var gain = atx.createGain();
+	
+	window.analyser = atx.createAnalyser(); analyser.fftSize = bufferSize;
+	window.analyserData = new Float32Array(analyser.frequencyBinCount);
 
-	gain.gain.value = window.localStorage.getItem("gain") || 0.02;
+	var node = atx.createScriptProcessor(bufferSize,2,2);
+	var gain = atx.createGain(); gain.gain.value = window.localStorage.getItem("gain") || 0.02;
 	
 	// HTML-Elements
 	var $view     = $(".dsp td:first-child");
@@ -68,6 +70,7 @@
 			// Register audio process and start playback
 			node.onaudioprocess = DSP.process;
 			node.connect(gain);
+			gain.connect(analyser);
 
 			// Event-Listeners
 			$run.addEventListener("click", DSP.parseCode, false);
@@ -85,7 +88,7 @@
 
 			if (!DSP.playing) { return; }
 
-			var freq = 0, current, last, in0, in1, out0, out1;
+			var sample, last, in0, in1, out0, out1;
 
 			if (DSP.micStream) {
 				in0 = e.inputBuffer.getChannelData(0);
@@ -97,20 +100,16 @@
 
 			for (var i = 0, l = out0.length; i < l; i++) {
 
-				if (DSP.micStream) { current = in0[i]; out0[i] = out1[i] = 0; }
-				else { current = out0[i] = out1[i]= f(DSP.time+=increase); }
+				if (DSP.micStream) { sample = in0[i]; out0[i] = out1[i] = 0; }
+				else { sample = out0[i] = out1[i]= f(DSP.time+=increase); }
 
-				if (DSP.diagram == "wave") { DSP.displayWave(current,i); }
-				if ((current>0&&last<0)||(current<0&&last>0)){freq++;}
-
-				last = current;
+				if (DSP.diagram == "wave") { DSP.displayWave(sample,i); }
 			}
+
+			analyser.getFloatFrequencyData(analyserData);
 
 			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
 			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
-
-			DSP.freq = freq;
-
 			if (DSP.generatingThumbnail) { DSP.generateThumbnail(true); }
 		},
 
@@ -147,7 +146,7 @@
 
 			if (i==0) {
 
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,DSP.freq);
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,analyserData[0]);
 				Demo.Shader.gl.uniform1f(Demo.Shader.iSync,DSP.time);
 
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
@@ -164,22 +163,14 @@
 
 		displaySpectrum: function(data) {
 
-			var l = 512, u = W/l, i, j, real, imag;
+			var i, l = analyserData.length, u = W/l;
 
 			ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 			ctx.fillStyle = lineColor;
 			ctx.beginPath();
 
 			for(i = 0; i < l; i++) {
-
-				real = imag = 0;
-
-				for(j=0; j < l; j++ ) {
-					real += data[j]*Math.cos(Math.PI*i*j/l);
-					//imag += data[j]*Math.sin(Math.PI*i*j/l);
-				}
-
-				ctx.rect(i*u,HH,u*2,-Math.abs(real));
+				ctx.rect(i*u,H-40,u*2,-(HH+analyserData[i]));
 			}
 
 			ctx.fill();
@@ -187,22 +178,11 @@
 
 		displaySpectrogram: function(data) {
 			
-			var l = 512, con = -2*Math.PI/l, i, j, b, real, imag, val;
+			var i, l = analyserData.length;
 
-			for(i = 0; i < l/2; i++) {
-
-				real = imag = 0;
-
-				for(j= 0 ; j < l; j++) {
-
-					real += data[j]*Math.cos(b = con*i*j);
-					imag += data[j]*Math.sin(b);
-				}
-
-				val = ~~(10 * Math.log(real*real+imag*imag)+170);
-
-				ctx.fillStyle = "hsl("+val+",80%,50%)";
-				ctx.fillRect(ftcount%W, ~~(i*(l/(i+15))*H/l)*0.95, 1, ~~((l/(i+15))*H/l+1));
+			for(i = 0; i < l; i++) {
+				ctx.fillStyle = "hsl(" + analyserData[i] + ",80%,50%)";
+				ctx.fillRect(ftcount%W,i,1,i);
 			}
 
 			ftcount++;
@@ -264,11 +244,11 @@
 			if (DSP.playing) {
 
 				timer = window.setInterval(DSP.updateInfo, 100);
-				gain.connect(atx.destination);
+				analyser.connect(atx.destination);
 
 			} else {
 				window.clearInterval(timer);
-				gain.disconnect();
+				analyser.disconnect();
 			}
 
 			$play.setAttribute("data-status", DSP.playing ? "1" : "0");
@@ -282,7 +262,7 @@
 			if (!enabled) {
 				navigator.getUserMedia({ audio: true }, function(stream) {
 					DSP.micStream = stream;
-					src = atx.createMediaStreamSource(stream).connect(node);
+					src = atx.createMediaStreamSource(stream).connect(gain);
 					$mic.className = $mic.className.replace("disabled", "");
 					$code.className += " disabled";
 				}, function(e) { alert("Access denied"); });
@@ -297,7 +277,7 @@
 		generateThumbnail: function(stop) {
 
 			if (stop === true) {
-				if (!DSP.playState) { gain.disconnect(); }
+				if (!DSP.playState) { analyser.disconnect(); }
 				DSP.playing = DSP.playState;
 				delete DSP.generatingThumbnail;
 				gain.gain.value = DSP.gainVal;
@@ -312,7 +292,7 @@
 
 			DSP.gainVal = gain.gain.value;
 			gain.gain.value = 0;
-			gain.connect(atx.destination);
+			analyser.connect(atx.destination);
 		},
 
 		reset: function() {
