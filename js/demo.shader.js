@@ -1,6 +1,6 @@
 ;(function(Demo, window, undefined) {
 
-	var gl  = $(".shader canvas").getContext("webgl");
+	var gl = null;
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSample;uniform float iSync;\n"
 
@@ -34,7 +34,23 @@
 		pauseTime: 0,
 		fpsStartTime: 0,
 
+		getContext: function(canvas) {
+
+			var ctx = null;
+			var contextIds = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+			var attributes = { alpha: false, depth: false, antialias: false, stencil: false, premultipliedAlpha: false, preserveDrawingBuffer: false };
+
+			contextIds.some(function(v) {
+				try { ctx = canvas.getContext(v, attributes); } catch(e){}
+				if (ctx) { return true; }
+			});
+
+			return ctx;
+		},
+
 		init: function(example) {
+
+			gl = Shader.getContext($canvas);
 
 			Shader.example = examples[example] ? example : "Choose Example";
 			$examples.value = Shader.example;
