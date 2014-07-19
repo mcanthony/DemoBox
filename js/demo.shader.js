@@ -47,6 +47,7 @@
 
 			// Setup view, compile and run
 			Shader.compile();
+			Shader.pause = true;
 			Shader.canvasSetup();
 
 			// Register event-listeners
@@ -151,8 +152,6 @@
 			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-			Shader.togglePlayback(false);
-			Shader.pauseTime = 0;
 			Shader.render();
 		},
 
