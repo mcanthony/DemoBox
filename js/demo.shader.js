@@ -32,7 +32,9 @@
 		pauseTime: 0,
 		fpsStartTime: 0,
 
-		init: function() {
+		init: function(example) {
+
+			Shader.example = examples[example] ? example : "Choose Example";
 
 			// Setup Ace-Editor
 			Shader.setupEditor();
@@ -188,10 +190,10 @@
 				name: 'compile',
 				bindKey: {win: 'Ctrl-Enter',  mac: 'Command-Enter'},
 				exec: Shader.compile
-			});			
+			});
 
 			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { Shader.Editor.setValue(atob(examples["Choose Example"])); }
+			if (!Demo.base64[0]||$_GET.shaderExample) { Shader.Editor.setValue(atob(examples[Shader.example])); }
 			else { Shader.Editor.setValue(atob(Demo.base64[0])); }
 
 			Shader.Editor.gotoLine(0);
@@ -202,8 +204,9 @@
 			$fps.innerHTML = (Shader.fps<9?"0"+Shader.fps:Shader.fps) + " FPS";
 		},
 
-		loadExample: function() {
-			var which = $examples.value;
+		loadExample: function(str) {
+			var which = str || $examples.value;
+			if (!examples[which]) { which = "Choose Example"; }
 
 			Shader.Editor.setValue(atob(examples[which]));
 			Shader.Editor.gotoLine(0);

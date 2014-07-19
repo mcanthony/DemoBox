@@ -5,7 +5,22 @@
 		if (list.length == 1) { list = list[0]; }
 
 		return list.length==0?null:list;
-	}
+	};
+
+	window.$_GET = (function() {
+		
+		var $_GET = {},
+		    params = location.search.substr(1).split("&"),
+		    pair, i, l;
+
+		for (i = 0, l = params.length; i < l; i++) {
+			pair = params[i].split("=");
+			$_GET[pair[0]] = pair[1];
+		}
+
+		return $_GET;
+
+	}());
 
 	NodeList.prototype.on = HTMLCollection.prototype.on = function(type, fn) {
 		[].forEach.call(this, function(v, i) {

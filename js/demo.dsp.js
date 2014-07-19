@@ -49,7 +49,9 @@
 		playing: false,
 		diagram: "wave",
 
-		init: function() {
+		init: function(example) {
+
+			DSP.example = examples[example] ? example : "Choose Example";
 
 			// Setup Ace-Editor
 			DSP.setupEditor();
@@ -337,7 +339,7 @@
 			});
 
 			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { DSP.Editor.setValue(atob(examples["Choose Example"])); }
+			if (!Demo.base64[1]||$_GET.dspExample) { DSP.Editor.setValue(atob(examples[DSP.example])); }
 			else { DSP.Editor.setValue(atob(Demo.base64[1])); }
 
 			DSP.Editor.gotoLine(0);
@@ -350,9 +352,12 @@
 		},
 
 		loadExample: function() {
-			var which = $examples.value;
+			var which = str || $examples.value;
+			if (!examples[which]) { which = "Choose Example"; }
+
 			DSP.Editor.setValue(atob(examples[which]));
 			DSP.Editor.gotoLine(0);
+
 			DSP.parseCode();
 			DSP.generateThumbnail();
 		}
