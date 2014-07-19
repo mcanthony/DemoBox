@@ -241,7 +241,7 @@
 			$script.innerHTML = "try{window.f=function(r){"+DSP.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){DSP.error(e)}";
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); }
+			if (e) { window.location.search = ""; window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); }
 			
 			// Append the script
 			document.body.appendChild($script);
