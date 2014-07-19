@@ -25,8 +25,8 @@
 	var ctx = $(".dsp canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 	
-	window.analyser = atx.createAnalyser(); analyser.fftSize = bufferSize;
-	window.analyserData = new Float32Array(analyser.frequencyBinCount);
+	var analyser = atx.createAnalyser(); analyser.fftSize = 512;
+	var analyserData = new Float32Array(analyser.frequencyBinCount);
 
 	var node = atx.createScriptProcessor(bufferSize,2,2);
 	var gain = atx.createGain(); gain.gain.value = window.localStorage.getItem("gain") || 0.02;
@@ -146,8 +146,8 @@
 
 			if (i==0) {
 
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSample,analyserData[0]);
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSync,DSP.time);
+				Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency, new Float32Array(analyserData));
+				Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
