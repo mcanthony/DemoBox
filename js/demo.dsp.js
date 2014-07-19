@@ -52,6 +52,7 @@
 		init: function(example) {
 
 			DSP.example = examples[example] ? example : "Choose Example";
+			$examples.value = DSP.example;
 
 			// Setup Ace-Editor
 			DSP.setupEditor();
@@ -353,7 +354,7 @@
 			window.localStorage.setItem("gain", val);
 		},
 
-		loadExample: function() {
+		loadExample: function(str) {
 			var which = typeof str == "string" ? str : $examples.value;
 			if (!examples[which]) { which = "Choose Example"; }
 

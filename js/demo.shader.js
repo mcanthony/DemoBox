@@ -35,6 +35,7 @@
 		init: function(example) {
 
 			Shader.example = examples[example] ? example : "Choose Example";
+			$examples.value = Shader.example;
 
 			// Setup Ace-Editor
 			Shader.setupEditor();
