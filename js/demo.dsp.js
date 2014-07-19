@@ -107,6 +107,8 @@
 			}
 
 			analyser.getFloatFrequencyData(analyserData);
+			Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency,analyserData);
+			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
 			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
 			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
@@ -145,9 +147,6 @@
 			var y = sample*waveSize+HH;
 
 			if (i==0) {
-
-				Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency, new Float32Array(analyserData));
-				Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
