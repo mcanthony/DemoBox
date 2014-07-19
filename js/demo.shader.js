@@ -216,7 +216,7 @@
 			Shader.compile();
 			Shader.togglePlayback(true);
 			Shader.pauseTime = 0;
-			Shader.pauseTime = new Date().getTime();
+			Shader.playTime = new Date().getTime();
 		}
 	};
 
