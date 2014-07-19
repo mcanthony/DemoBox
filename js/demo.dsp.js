@@ -178,11 +178,11 @@
 
 		displaySpectrogram: function(data) {
 			
-			var i, l = analyserData.length;
+			var i, l = analyserData.length, u = H/l;
 
 			for(i = 0; i < l; i++) {
 				ctx.fillStyle = "hsl(" + analyserData[i] + ",80%,50%)";
-				ctx.fillRect(ftcount%W,i,1,i);
+				ctx.fillRect(ftcount%W,u*i*0.9,1,1);
 			}
 
 			ftcount++;
