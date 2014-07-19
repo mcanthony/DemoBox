@@ -262,7 +262,8 @@
 			if (!enabled) {
 				navigator.getUserMedia({ audio: true }, function(stream) {
 					DSP.micStream = stream;
-					src = atx.createMediaStreamSource(stream).connect(gain);
+					src = atx.createMediaStreamSource(stream);
+					src.connect(node); src.connect(gain);
 					$mic.className = $mic.className.replace("disabled", "");
 					$code.className += " disabled";
 				}, function(e) { alert("Access denied"); });
