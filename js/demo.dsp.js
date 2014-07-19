@@ -298,10 +298,12 @@
 			if (stop === true) {
 				if (!DSP.playState) { gain.disconnect(); }
 				DSP.playing = DSP.playState;
-				DSP.generatingThumbnail = false;
+				delete DSP.generatingThumbnail;
 				gain.gain.value = DSP.gainVal;
 				return;
 			}
+
+			if (DSP.generatingThumbnail) { return; }
 
 			DSP.playState = DSP.playing;
 			DSP.playing = true;
