@@ -39,4 +39,8 @@
 		this.className = this.className.replace(new RegExp(name,"g"), "");
 	};
 
+	Object.getOwnPropertyNames(Math).forEach(function(v) {
+		window[v] = Math[v];
+	});
+
 }(window.Demo || (window.Demo = {}), window));

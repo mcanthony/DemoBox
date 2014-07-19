@@ -27,6 +27,39 @@ table {
 		vertical-align: top;
 	}
 
+.examples {
+	color: #999;
+	height: 100%;
+
+	padding: 2px;
+	margin-right: 10px;
+	border: 2px solid #000;
+	border-radius: 3px;
+
+	float: right;
+	background-color: #444;
+}
+
+.editor {
+	color: #FFF;
+	font-size: 12px;
+	line-height: 16px;
+	font-family: "Lucida Console", monospace;
+	background-color: #333;
+
+	height: 90%;
+	width: 100%;
+
+	border: 0px;
+	border-radius: 5px 5px 0px 0px;
+
+	display: block;
+	overflow-x: auto;
+	white-space: pre;
+	box-sizing: border-box;
+	resize: none;
+}
+
 .code-view { width: 100%; height: 100%; }
 .code-view.error { box-shadow: 0px 0px 0px 2px #F00; }
 
@@ -113,30 +146,7 @@ table {
 		display: inline-block;
 	}
 
-	.fps { float: right; margin-right: 15px; }
-
-#shader-editor, #dsp-editor {
-	color: #FFF;
-	font-size: 12px;
-	line-height: 16px;
-	font-family: "Lucida Console", monospace;
-	background-color: #333;
-
-	height: 90%;
-	width: 100%;
-
-	border: 0px;
-	border-radius: 5px 5px 0px 0px;
-
-	padding: 20px;
-	padding-top: 10px;
-
-	display: block;
-	overflow-x: auto;
-	white-space: pre;
-	box-sizing: border-box;
-	resize: none;
-}
+	.fps { margin-left: 15px; }
 
 	#shader-editor.disabled, #dsp-editor.disabled {
 		-webkit-filter: saturate(0) contrast(0.8);
@@ -149,7 +159,7 @@ table {
 
 
 #gain {
-  -webkit-appearance: none;  
+	-webkit-appearance: none;  
     width: 100px;  
     height: 10px;  
     border: 0px;
