@@ -4,9 +4,12 @@
 
 	window.f = function(){};
 	var W, H, HW, HH, timer;
-
 	var allowedVariables = ["Math", "r"].concat(Object.getOwnPropertyNames(Math));
-	var example = "/**\n * DSP (JavaScript)\n * \n * function f // sample function (called automaticly)\n * int      t // current sample passed to f()\n * int      r // sample rate in Hertz\n */\n\n// Too complex? Try something simple:\n// function f(t) { return Math.sin(2 * Math.PI * 440 * t); }\n\nvar beat   = 1/4;\nvar step   = 1/r/beat;\nvar notes  = \"CcDdEFfGgAaH\".split(\"\");\n\nvar melody = \"ADFADFAC-GFGADCED\".split(\"\");\nvar beat   = [2,8,1,2];\n\nvar b = beat[0], tt = beat.i = melody.i = 0, n;\n\nfunction f(t) {\n    if (t<0.01) { tt = 0; beat.i = 0; melody.i = 0; }\n    tt += step;\n    \n    n = tone(notes.indexOf(melody[melody.i%melody.length]),b);\n    b = beat[beat.i%beat.length];\n    \n    if (tt>1/b) { tt = 0; beat.i++; melody.i++;  }\n	return !n?0:squareWave(0.2*n*t,10)*0.3;\n}\n\nfunction squareWave(x,k) {for(var i=1,n=0;i<k;i++){n+=Math.sin(2*Math.PI*(2*i-1)*x)/(2*i-1)}return 4/Math.PI*n}\nfunction tone(n,octave) { return n==-1?0:Math.pow(Math.pow(2,1/12),n) * 440 * octave; }";
+
+	var examples = {
+		"Choose Example": "LyoqCiAqIERTUCAoSmF2YVNjcmlwdCkKICogCiAqIGZ1bmN0aW9uIGYgLy8gc2FtcGxlIGZ1bmN0aW9uIChjYWxsZWQgYXV0b21hdGljbHkpCiAqIGludCAgICAgIHQgLy8gY3VycmVudCBzYW1wbGUgcGFzc2VkIHRvIGYoKQogKiBpbnQgICAgICByIC8vIHNhbXBsZSByYXRlIGluIEhlcnR6CiAqLwoKZnVuY3Rpb24gZih0KSB7IHJldHVybiBNYXRoLnNpbigyICogTWF0aC5QSSAqIDQ0MCAqIHQpOyB9",
+		"Chiptune": "dmFyIGJlYXQgICA9IDEvNDsKdmFyIHN0ZXAgICA9IDEvci9iZWF0Owp2YXIgbm90ZXMgID0gIkNjRGRFRmZHZ0FhSCIuc3BsaXQoIiIpOwoKdmFyIG1lbG9keSA9ICJBREZBREZBQy1HRkdBRENFRCIuc3BsaXQoIiIpOwp2YXIgYmVhdCAgID0gWzIsOCwxLDJdOwoKdmFyIGIgPSBiZWF0WzBdLCB0dCA9IGJlYXQuaSA9IG1lbG9keS5pID0gMCwgbjsKCmZ1bmN0aW9uIGYodCkgewogICAgaWYgKHQ8MC4wMSkgeyB0dCA9IDA7IGJlYXQuaSA9IDA7IG1lbG9keS5pID0gMDsgfQogICAgdHQgKz0gc3RlcDsKICAgIAogICAgbiA9IHRvbmUobm90ZXMuaW5kZXhPZihtZWxvZHlbbWVsb2R5LmklbWVsb2R5Lmxlbmd0aF0pLGIpOwogICAgYiA9IGJlYXRbYmVhdC5pJWJlYXQubGVuZ3RoXTsKICAgIAogICAgaWYgKHR0PjEvYikgeyB0dCA9IDA7IGJlYXQuaSsrOyBtZWxvZHkuaSsrOyAgfQoJcmV0dXJuICFuPzA6c3F1YXJlV2F2ZSgwLjIqbip0LDEwKSowLjM7Cn0KCmZ1bmN0aW9uIHNxdWFyZVdhdmUoeCxrKSB7Zm9yKHZhciBpPTEsbj0wO2k8aztpKyspe24rPU1hdGguc2luKDIqTWF0aC5QSSooMippLTEpKngpLygyKmktMSl9cmV0dXJuIDQvTWF0aC5QSSpufQpmdW5jdGlvbiB0b25lKG4sb2N0YXZlKSB7IHJldHVybiBuPT0tMT8wOk1hdGgucG93KE1hdGgucG93KDIsMS8xMiksbikgKiA0NDAgKiBvY3RhdmU7IH0="
+	};
 
 	// Settings
 	var bufferSize = 2048;
@@ -36,6 +39,7 @@
 	var $time     = $(".dsp .time");
 	var $mic      = $(".dsp .mic");
 	var $gain     = $("#gain");
+	var $examples = $(".dsp .examples");
 
 	$gain.value = gain.gain.value;
 
@@ -68,6 +72,7 @@
 			$reset.addEventListener("click", DSP.reset, false);
 			$mic.addEventListener("click", DSP.toggleMic, false);
 			$gain.addEventListener("change", DSP.gainSlider, false);
+			$examples.addEventListener("change", DSP.loadExample, false);
 			window.addEventListener("resize", DSP.canvasSetup, false);
 			
 			$(".diagram-controls span").on("click", DSP.toggleDiagram);
@@ -102,6 +107,8 @@
 			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
 
 			DSP.freq = freq;
+
+			if (DSP.generatingThumbnail) { DSP.generateThumbnail(true); }
 		},
 
 		canvasSetup: function() {
@@ -284,20 +291,23 @@
 			}
 		},
 
-		generateThumbnail: function() {
+		generateThumbnail: function(stop) {
 
-			var playState = DSP.playing;
+			if (stop === true) {
+				if (!DSP.playState) { gain.disconnect(); }
+				DSP.playing = DSP.playState;
+				DSP.generatingThumbnail = false;
+				gain.gain.value = DSP.gainVal;
+				return;
+			}
+
+			DSP.playState = DSP.playing;
 			DSP.playing = true;
+			DSP.generatingThumbnail = true;
 
-			var gainVal = gain.gain.value;
+			DSP.gainVal = gain.gain.value;
 			gain.gain.value = 0;
-
 			gain.connect(atx.destination);
-			window.setTimeout(function() {
-				if (!playState) { gain.disconnect(); }
-				gain.gain.value = gainVal;
-				DSP.playing = playState;
-			}, 100);
 		},
 
 		reset: function() {
@@ -327,7 +337,7 @@
 			});
 
 			// Use default code example if there's no base64 URL hash
-			if (Demo.base64.length==1) { DSP.Editor.setValue(example); }
+			if (Demo.base64.length==1) { DSP.Editor.setValue(atob(examples["Choose Example"])); }
 			else { DSP.Editor.setValue(atob(Demo.base64[1])); }
 
 			DSP.Editor.gotoLine(0);
@@ -337,6 +347,14 @@
 			var val = e.target.value;
 			gain.gain.value = val;
 			window.localStorage.setItem("gain", val);
+		},
+
+		loadExample: function() {
+			var which = $examples.value;
+			DSP.Editor.setValue(atob(examples[which]));
+			DSP.Editor.gotoLine(0);
+			DSP.parseCode();
+			DSP.generateThumbnail();
 		}
 	};
 
