@@ -352,7 +352,7 @@
 		},
 
 		loadExample: function() {
-			var which = str || $examples.value;
+			var which = typeof str == "string" ? str : $examples.value;
 			if (!examples[which]) { which = "Choose Example"; }
 
 			DSP.Editor.setValue(atob(examples[which]));

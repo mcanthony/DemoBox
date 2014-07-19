@@ -44,9 +44,6 @@
 
 			// Setup view, compile and run
 			Shader.canvasSetup();
-			Shader.compile();
-			Shader.togglePlayback(false);
-			Shader.pauseTime = 0;
 
 			// Register event-listeners
 			$run.addEventListener("click", Shader.compile, false);
@@ -148,6 +145,10 @@
 			// Update uniform and viewport
 			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+			Shader.compile();
+			Shader.togglePlayback(false);
+			Shader.pauseTime = 0;
 		},
 
 		togglePlayback: function(e) {
@@ -205,7 +206,7 @@
 		},
 
 		loadExample: function(str) {
-			var which = str || $examples.value;
+			var which = typeof str == "string" ? str : $examples.value;
 			if (!examples[which]) { which = "Choose Example"; }
 
 			Shader.Editor.setValue(atob(examples[which]));
