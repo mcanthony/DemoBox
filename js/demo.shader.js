@@ -13,15 +13,17 @@
 	};
 
 	// HTML-Elements
-	var $view     = $(".shader td:first-child");
-	var $codeView = $(".shader .code-view");
-	var $code     = $("#shader-editor");
-	var $play     = $(".shader .play-pause");
-	var $reset    = $(".shader .reset");
-	var $run      = $(".shader .run");
-	var $time     = $(".shader .time");
-	var $fps      = $(".shader .fps");
-	var $examples = $(".shader .examples");
+	var $canvas     = $(".shader canvas");
+	var $view       = $(".shader td:first-child");
+	var $codeView   = $(".shader .code-view");
+	var $code       = $("#shader-editor");
+	var $play       = $(".shader .play-pause");
+	var $reset      = $(".shader .reset");
+	var $run        = $(".shader .run");
+	var $time       = $(".shader .time");
+	var $fps        = $(".shader .fps");
+	var $examples   = $(".shader .examples");
+	var $fullscreen = $(".shader .fullscreen");
 
 	var Shader = Demo.Shader = {
 
@@ -44,12 +46,14 @@
 			Shader.gl = gl;
 
 			// Setup view, compile and run
+			Shader.compile();
 			Shader.canvasSetup();
 
 			// Register event-listeners
 			$run.addEventListener("click", Shader.compile, false);
 			$play.addEventListener("click", Shader.togglePlayback, false);
 			$reset.addEventListener("click", Shader.reset, false);
+			$fullscreen.addEventListener("click", Shader.toggleFullscreen, false);
 			$examples.addEventListener("change", Shader.loadExample, false);
 			window.addEventListener("resize", Shader.canvasSetup, false);
 		},
@@ -140,16 +144,16 @@
 		canvasSetup: function() {
 
 			// Update with and height
-			gl.canvas.width = $view.offsetWidth;
-			gl.canvas.height = $view.offsetHeight;
+			gl.canvas.width = Shader.isFullscreen ? window.innerWidth : $view.offsetWidth;
+			gl.canvas.height = Shader.isFullscreen ? window.innerHeight : $view.offsetHeight;
 
 			// Update uniform and viewport
 			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-			Shader.compile();
 			Shader.togglePlayback(false);
 			Shader.pauseTime = 0;
+			Shader.render();
 		},
 
 		togglePlayback: function(e) {
@@ -217,6 +221,26 @@
 			Shader.togglePlayback(true);
 			Shader.pauseTime = 0;
 			Shader.playTime = new Date().getTime();
+		},
+
+		toggleFullscreen: function(e) {
+
+			Shader.isFullscreen = document.fullscreen || document.mozFullScreen || document.webkitIsFullScreen;
+
+			if (!Shader.isFullscreen) {
+				if ($canvas.requestFullscreen) { $canvas.requestFullscreen(); }
+				else if ($canvas.mozRequestFullScreen) { $canvas.mozRequestFullScreen(); }
+				else if ($canvas.webkitRequestFullscreen) { $canvas.webkitRequestFullscreen(); }
+			}
+
+			if (!Shader.toggleFullscreen.listening) {
+				Shader.toggleFullscreen.listening = true;
+				$canvas.addEventListener("fullscreenchange", Shader.toggleFullscreen, false);
+				$canvas.addEventListener("mozfullscreenchange", Shader.toggleFullscreen, false);
+				$canvas.addEventListener("webkitfullscreenchange", Shader.toggleFullscreen, false);
+			}
+
+			$canvas.style.borderRadius = Shader.isFullscreen ? "0px" : "5px";
 		}
 	};
 

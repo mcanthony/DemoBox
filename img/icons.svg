@@ -2,27 +2,37 @@
 <!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="224px" height="32px" viewBox="0.5 16.5 224 32" enable-background="new 0.5 16.5 224 32" xml:space="preserve">
-<polygon fill="#B4BDB4" points="38.5,18.5 46.5,18.5 46.5,46.411 38.5,46.5 "/>
-<polygon fill="#B4BDB4" points="50.5,18.5 58.5,18.5 58.5,46.411 50.5,46.5 "/>
-<polygon fill="#B4BDB4" points="4.5,18.5 28.5,32.5 4.5,46.5 "/>
-<polygon fill="#B4BDB4" points="68.5,18.5 74.5,18.5 74.5,46.411 68.5,46.5 "/>
-<polygon fill="#B4BDB4" points="92.5,18.5 76.5,32.5 92.5,46.5 "/>
-<path fill="#B4BDB4" d="M110.5,18.5c-4.418,0-8,3.582-8,8v6c0,4.418,3.582,8,8,8s8-3.582,8-8v-6
-	C118.5,22.082,114.918,18.5,110.5,18.5z"/>
+	 width="256px" height="32px" viewBox="109.5 5.5 256 32" enable-background="new 109.5 5.5 256 32" xml:space="preserve">
+<path d="M365.5,34.5c0,1.657-1.343,3-3,3h-26.083c-1.657,0-3-1.343-3-3v-26c0-1.656,1.343-3,3-3H362.5c1.657,0,3,1.344,3,3V34.5z"/>
+<polygon fill="#B4BDB4" points="148,7.477 156,7.477 156,35.389 148,35.477 "/>
+<polygon fill="#B4BDB4" points="160,7.477 168,7.477 168,35.389 160,35.477 "/>
+<polygon fill="#B4BDB4" points="114,7.477 138,21.477 114,35.477 "/>
+<polygon fill="#B4BDB4" points="178,7.477 184,7.477 184,35.389 178,35.477 "/>
+<polygon fill="#B4BDB4" points="202,7.477 186,21.477 202,35.477 "/>
+<path fill="#B4BDB4" d="M220,7.477c-4.418,0-8,3.582-8,8v6c0,4.418,3.582,8,8,8c4.417,0,8-3.582,8-8v-6
+	C228,11.059,224.417,7.477,220,7.477z"/>
 <path fill="none" stroke="#B4BDB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
-	M100.5,34.5c2,8,8,8,10,8s8,0,10-8"/>
-<line fill="none" stroke="#B4BDB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="110.5" y1="42.5" x2="110.5" y2="46.547"/>
+	M210,23.477c2,8,8,8,10,8s8,0,10-8"/>
+<line fill="none" stroke="#B4BDB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="220" y1="31.477" x2="220" y2="35.523"/>
 <path fill="none" stroke="#B4BDB4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
-	M132.5,32.5c0,0,0-4,6-4s6,8,12,8s6-4,6-4"/>
-<rect x="164.5" y="36.5" fill="#B4BDB4" width="2" height="2"/>
-<rect x="181.5" y="26.5" fill="#B4BDB4" width="2" height="12"/>
-<rect x="186.5" y="34.5" fill="#B4BDB4" width="2" height="4"/>
-<rect x="168.5" y="34.5" fill="#B4BDB4" width="2" height="4"/>
-<rect x="176.5" y="32.5" fill="#B4BDB4" width="2" height="6"/>
-<rect x="172.5" y="36.5" fill="#B4BDB4" width="2" height="2"/>
-<path fill="#B4BDB4" d="M216.5,38.5c0,1.105,4,2-8,2s-8-0.895-8-2s-4-2,8-2S216.5,37.395,216.5,38.5z"/>
-<path fill="#B4BDB4" d="M220.5,34.5c0,1.105,4,1.875-12,2s-12-0.895-12-2s-4-2,12-2S220.5,33.395,220.5,34.5z"/>
-<path fill="#B4BDB4" d="M215.5,30.5c0,1.105,5,2-7,2s-7-0.895-7-2s-5-2,7-2S215.5,29.395,215.5,30.5z"/>
-<path fill="#B4BDB4" d="M217.5,26.5c0,1.105,5,2-9,2c-12,0-9-0.895-9-2s-3-2,9-2C222.5,24.5,217.5,25.395,217.5,26.5z"/>
+	M242,21.477c0,0,0-4,6-4s6,8,12,8s6-4,6-4"/>
+<rect x="274" y="25.477" fill="#B4BDB4" width="2" height="2"/>
+<rect x="291" y="15.477" fill="#B4BDB4" width="2" height="12"/>
+<rect x="296" y="23.477" fill="#B4BDB4" width="2" height="4"/>
+<rect x="278" y="23.477" fill="#B4BDB4" width="2" height="4"/>
+<rect x="286" y="21.477" fill="#B4BDB4" width="2" height="6"/>
+<rect x="282" y="25.477" fill="#B4BDB4" width="2" height="2"/>
+<path fill="#B4BDB4" d="M326,27.477c0,1.105,4,2-8,2s-8-0.895-8-2s-4-2,8-2S326,26.371,326,27.477z"/>
+<path fill="#B4BDB4" d="M330,23.477c0,1.105,4,1.875-12,2s-12-0.895-12-2s-4-2,12-2S330,22.371,330,23.477z"/>
+<path fill="#B4BDB4" d="M325,19.477c0,1.105,5,2-7,2s-7-0.895-7-2s-5-2,7-2S325,18.371,325,19.477z"/>
+<path fill="#B4BDB4" d="M327,15.477c0,1.105,5,2-9,2c-12,0-9-0.895-9-2s-3-2,9-2C332,13.477,327,14.371,327,15.477z"/>
+<rect x="349.5" y="21.5" fill="#B4BDB4" stroke="#000000" stroke-miterlimit="10" width="0" height="0"/>
+<rect x="338.5" y="10.5" fill="#FFFFFF" width="3" height="8"/>
+<rect x="338.5" y="10.5" fill="#FFFFFF" width="8" height="3"/>
+<rect x="352.5" y="10.5" fill="#FFFFFF" width="8" height="3"/>
+<rect x="357.5" y="10.5" fill="#FFFFFF" width="3" height="8"/>
+<rect x="338.5" y="29.5" fill="#FFFFFF" width="8" height="3"/>
+<rect x="338.5" y="24.5" fill="#FFFFFF" width="3" height="8"/>
+<rect x="357.5" y="24.5" fill="#FFFFFF" width="3" height="8"/>
+<rect x="352.5" y="29.5" fill="#FFFFFF" width="8" height="3"/>
 </svg>
