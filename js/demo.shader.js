@@ -104,7 +104,7 @@
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.search = ""; window.location.hash = btoa(codeValue) + ";" + btoa(Demo.DSP.Editor.getValue()); }
+			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.DSP.Editor.getValue()); window.location.search = ""; }
 
 			var err = gl.getError();
 
