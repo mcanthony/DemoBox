@@ -79,6 +79,9 @@
 
 		compile: function(e) {
 
+			// Stop rendering
+			window.cancelAnimationFrame(Shader.animationRequest);
+
 			// Remove error class
 			$codeView.className = $codeView.className.replace("error", "");
 
@@ -242,8 +245,6 @@
 
 			Shader.Editor.setValue(atob(examples[which]));
 			Shader.Editor.gotoLine(0);
-
-			window.cancelAnimationFrame(Shader.animationRequest);
 
 			Shader.compile();
 			Shader.togglePlayback(true);
