@@ -170,9 +170,7 @@
 			ctx.fillStyle = lineColor;
 			ctx.beginPath();
 
-			for(i = 0; i < l; i++) {
-				ctx.rect(i*u,HH,u*2,-analyserData[i]);
-			}
+			for(i = 0; i < l; i++) { ctx.rect(i*u,HH,u*2,-analyserData[i]); }
 
 			ctx.fill();
 		},
@@ -182,8 +180,8 @@
 			var i, l = analyserData.length, u = H/l;
 
 			for(i = 0; i < l; i++) {
-				ctx.fillStyle = "rgba(0,255,153," + (analyserData[i]/256) + ")";
-				ctx.fillRect(ftcount%W,u*i*0.9,1,1);
+				ctx.fillStyle = "rgba(0,255,153," + (analyserData[i]/255) + ")";
+				ctx.fillRect(ftcount%W,H-u*i*0.9-40,1,1);
 			}
 
 			ftcount++;
@@ -271,12 +269,14 @@
 					DSP.micStream = stream;
 					src = atx.createMediaStreamSource(stream);
 					src.connect(node); src.connect(gain);
+					analyser.disconnect();
 					$mic.className = $mic.className.replace("disabled", "");
 					$code.className += " disabled";
 				}, function(e) { alert("Access denied"); });
 			} else {
 				DSP.micStream.stop();
 				DSP.micStream = false;
+				analyser.connect(atx.destination);
 				$mic.className += " disabled";
 				$code.className = $code.className.replace("disabled", "");
 			}
