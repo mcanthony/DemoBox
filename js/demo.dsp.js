@@ -180,8 +180,10 @@
 			var i, l = analyserData.length, u = H/l;
 
 			for(i = 0; i < l; i++) {
+				ctx.fillStyle = "#111";
+				ctx.fillRect(ftcount%W,H-u*i*0.95-40,1,1);
 				ctx.fillStyle = "rgba(0,255,153," + (analyserData[i]/255) + ")";
-				ctx.fillRect(ftcount%W,H-u*i*0.9-40,1,1);
+				ctx.fillRect(ftcount%W,H-u*i*0.95-40,1,1);
 			}
 
 			ftcount++;
