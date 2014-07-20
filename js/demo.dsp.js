@@ -13,7 +13,7 @@
 
 	// Settings
 	var bufferSize = 2048;
-	var waveSize   = 50;
+	var waveSize   = 800;
 	var lineWidth  = 5;
 	var lineColor  = "#0F9";
 	var ftcount    = 0;
@@ -100,18 +100,17 @@
 			out1 = e.outputBuffer.getChannelData(1);
 
 			for (var i = 0, l = out0.length; i < l; i++) {
-
 				if (DSP.micStream) { sample = in0[i]; out0[i] = out1[i] = 0; }
 				else { sample = out0[i] = out1[i]= f(DSP.time+=increase); }
-
-				if (DSP.diagram == "wave") { DSP.displayWave(sample,i); }
 			}
 
 			analyser.getByteFrequencyData(analyserData);
 			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
-			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
-			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
+			if (DSP.diagram == "wave") { analyser.getByteTimeDomainData(analyserData); DSP.displayWave(DSP.micStream ? in0 : out0); }
+			else if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
+			else if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
+
 			if (DSP.generatingThumbnail) { DSP.generateThumbnail(true); }
 			
 			DSP.updateFrequencyTexture();
@@ -143,23 +142,23 @@
 			}
 		},
 
-		displayWave: function(sample, i) {
+		displayWave: function(data) {
 
-			var x = (i/bufferSize)*W;
-			var y = sample*waveSize+HH;
+			var i, x, y, l = analyserData.length, u = W/l;
 
-			if (i==0) {
+			ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
+			ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
 
-				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
-				ctx.fillStyle = "#222"; ctx.fillRect(0,HH,W,2);
+			ctx.beginPath();
 
-				ctx.beginPath(); ctx.moveTo(x,y);
-				return;
+			for(i = 0; i < l; i++) {
+				x = (i/l)*W;
+				y = HH-analyserData[i]/255*waveSize+waveSize/2;
+				if (i == 0) { ctx.moveTo(x,y); }
+				ctx.lineTo(x,y);
 			}
 
-			ctx.lineTo(x,y);
-
-			if (i==bufferSize-1) { ctx.stroke(); }
+			ctx.stroke();
 		},
 
 		displaySpectrum: function(data) {
