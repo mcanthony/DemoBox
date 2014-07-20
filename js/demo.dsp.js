@@ -25,7 +25,7 @@
 	var ctx = $(".dsp canvas").getContext("2d");
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 	
-	var analyser = atx.createAnalyser(); analyser.fftSize = 512;
+	var analyser = atx.createAnalyser(); analyser.fftSize = 2048;
 	var analyserData = new Float32Array(analyser.frequencyBinCount);
 
 	var node = atx.createScriptProcessor(bufferSize,2,2);
@@ -107,7 +107,7 @@
 			}
 
 			analyser.getFloatFrequencyData(analyserData);
-			Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency,analyserData);
+			Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency, [].slice.call(analyserData,0,512));
 			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
 			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
