@@ -1,0 +1,32 @@
+{
+  "name": "DemoBox",
+  "version": "0.1.0",
+  "description": "A tool developed for creating demos using the latest HTML5 APIs.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elias94xx/DemoBox.git"
+  },
+  "keywords": [
+    "html5",
+    "javascript",
+    "glsl",
+    "webgl",
+    "audio",
+    "demo",
+    "shader",
+    "dsp"
+  ],
+  "author": "Elias Schütt",
+  "license": "CC-BY-NC-SA 4.0",
+  "bugs": {
+    "url": ".chttps://githubom/elias94xx/DemoBox/issues"
+  },
+  "homepage": "http://elias-schuett.de/git/DemoBox/",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-sass": "~0.9.0",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}

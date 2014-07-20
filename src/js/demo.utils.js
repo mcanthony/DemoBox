@@ -1,10 +1,11 @@
 ;(function(Demo, window, undefined) {
 
+	"use strict";
+
 	window.$ = function(str) {
 		var list = document.querySelectorAll(str);
 		if (list.length == 1) { list = list[0]; }
-
-		return list.length==0?null:list;
+		return list.length === 0 ? null : list;
 	};
 
 	window.$_GET = (function() {

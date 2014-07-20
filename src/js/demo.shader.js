@@ -1,5 +1,7 @@
 ;(function(Demo, window, undefined) {
 
+	"use strict";
+
 	var gl = null;
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
 	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform sampler2D iFrequency;uniform float iSync;\n"
@@ -36,6 +38,10 @@
 		pauseTime: 0,
 		fpsStartTime: 0,
 
+		/* ========================= */
+		/* ====== GET CONTEXT ====== */
+		/* ========================= */
+
 		getContext: function(canvas) {
 
 			var ctx = null;
@@ -49,6 +55,10 @@
 
 			return ctx;
 		},
+
+		/* ================== */
+		/* ====== INIT ====== */
+		/* ================== */
 
 		init: function(example) {
 
@@ -66,7 +76,7 @@
 			// Setup view, compile and run
 			Shader.pause = true;
 			Shader.compile();
-			Shader.canvasSetup();
+			Shader.setupCanvas();
 
 			// Register event-listeners
 			$run.addEventListener("click", Shader.compile, false);
@@ -74,8 +84,12 @@
 			$reset.addEventListener("click", Shader.reset, false);
 			$fullscreen.addEventListener("click", Shader.toggleFullscreen, false);
 			$examples.addEventListener("change", Shader.loadExample, false);
-			window.addEventListener("resize", Shader.canvasSetup, false);
+			window.addEventListener("resize", Shader.setupCanvas, false);
 		},
+
+		/* ===================== */
+		/* ====== COMPILE ====== */
+		/* ===================== */
 
 		compile: function(e) {
 
@@ -125,14 +139,12 @@
 			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1.0,-1.0,1.0,-1.0,-1.0,1.0,1.0,-1.0,1.0,1.0,-1.0,1.0]), gl.STATIC_DRAW);
 			gl.enableVertexAttribArray(Shader.bfr);
 
-			// Prefill iFrequency array
+			// Setup iDSP texture
 			gl.bindTexture(gl.TEXTURE_2D, Shader.frequencyTexture = gl.createTexture());
-
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.CLAMP_TO_EDGE);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.CLAMP_TO_EDGE);
-
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 512, 2, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, null);
 
 			// Setup viewport
@@ -149,70 +161,9 @@
 			else { Shader.render(); }
 		},
 
-		render: function() {
-
-			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
-			Shader.time = (new Date().getTime() - Shader.playTime) / 1000;
-
-			gl.uniform1f(Shader.iGlobalTime, Shader.time);
-			gl.vertexAttribPointer(Shader.aPos, 2, gl.FLOAT, false, 0, 0);
-			gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-			Shader.fps = Shader.getFPS();
-		},
-
-		getFPS: function() {
-
-			var interval = (new Date().getTime()-Shader.fpsStartTime)/1000;
-
-			if (interval>1) {
-				Shader.fpsStartTime = new Date().getTime();
-				Shader.frameNumber = 0;
-			}
-
-			return Math.min(Math.floor(++Shader.frameNumber/interval),60);
-		},
-
-		canvasSetup: function() {
-
-			// Update with and height
-			gl.canvas.width = Shader.isFullscreen ? window.innerWidth : $view.offsetWidth;
-			gl.canvas.height = Shader.isFullscreen ? window.innerHeight : $view.offsetHeight;
-
-			// Update uniform and viewport
-			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
-			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-			Shader.render();
-		},
-
-		togglePlayback: function(e) {
-
-			if (typeof e == "boolean") { Shader.pause = !e; }
-			else { Shader.pause = !Shader.pause; }
-
-			if (!Shader.pause) {
-				Shader.playTime += new Date().getTime() - Shader.pauseTime;
-				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
-				Shader.render();
-			} else {
-				Shader.pauseTime = new Date().getTime();
-				window.clearInterval(Shader.updateTimer);
-			}
-
-			$play.setAttribute("data-status", Shader.pause ? "0" : "1");
-			$play.style.backgroundPosition = Shader.pause ? "0px 0px" : "-20px 0px";
-		},
-
-		reset: function() {
-			$time.innerHTML = "0.00";
-			if (Shader.pause){ Shader.playTime = Shader.pauseTime = 0; }
-			else { Shader.playTime = new Date().getTime(); }
-		},
-
-		error: function(e) {
-			$codeView.className += " error";
-		},
+		/* ========================== */
+		/* ====== SETUP EDITOR ====== */
+		/* ========================== */
 
 		setupEditor: function() {
 
@@ -234,24 +185,107 @@
 			Shader.Editor.gotoLine(0);
 		},
 
+		/* ========================== */
+		/* ====== SETUP CANVAS ====== */
+		/* ========================== */
+
+		setupCanvas: function() {
+
+			// Update with and height
+			gl.canvas.width = Shader.isFullscreen ? window.innerWidth : $view.offsetWidth;
+			gl.canvas.height = Shader.isFullscreen ? window.innerHeight : $view.offsetHeight;
+
+			// Update uniform and viewport
+			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
+			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+			Shader.render();
+		},
+
+		/* ==================== */
+		/* ====== RENDER ====== */
+		/* ==================== */
+
+		render: function() {
+
+			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
+			Shader.time = (new Date().getTime() - Shader.playTime) / 1000;
+
+			gl.uniform1f(Shader.iGlobalTime, Shader.time);
+			gl.vertexAttribPointer(Shader.aPos, 2, gl.FLOAT, false, 0, 0);
+			gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+			Shader.fps = Shader.getFPS();
+		},
+
+		/* ===================== */
+		/* ====== GET FPS ====== */
+		/* ===================== */
+
+		getFPS: function() {
+
+			var interval = (new Date().getTime()-Shader.fpsStartTime)/1000;
+
+			if (interval>1) {
+				Shader.fpsStartTime = new Date().getTime();
+				Shader.frameNumber = 0;
+			}
+
+			return Math.min(Math.floor(++Shader.frameNumber/interval),60);
+		},
+
+		/* ============================= */
+		/* ====== TOGGLE PLAYBACK ====== */
+		/* ============================= */
+
+		togglePlayback: function(e) {
+
+			if (typeof e == "boolean") { Shader.pause = !e; }
+			else { Shader.pause = !Shader.pause; }
+
+			if (!Shader.pause) {
+				Shader.playTime += new Date().getTime() - Shader.pauseTime;
+				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
+				Shader.render();
+			} else {
+				Shader.pauseTime = new Date().getTime();
+				window.clearInterval(Shader.updateTimer);
+			}
+
+			$play.setAttribute("data-status", Shader.pause ? "0" : "1");
+			$play.style.backgroundPosition = Shader.pause ? "0px 0px" : "-20px 0px";
+		},
+
+		/* =================== */
+		/* ====== RESET ====== */
+		/* =================== */
+
+		reset: function() {
+			$time.innerHTML = "0.00";
+			if (Shader.pause){ Shader.playTime = Shader.pauseTime = 0; }
+			else { Shader.playTime = new Date().getTime(); }
+		},
+
+		/* =================== */
+		/* ====== ERROR ====== */
+		/* =================== */
+
+		error: function(e) {
+			$codeView.className += " error";
+		},
+
+		/* ========================= */
+		/* ====== UPDATE INFO ====== */
+		/* ========================= */
+
 		updateInfo: function() {
 			$time.innerHTML = Shader.time.toFixed(2);
 			$fps.innerHTML = (Shader.fps<9?"0"+Shader.fps:Shader.fps) + " FPS";
 		},
 
-		loadExample: function(str) {
-			var which = typeof str == "string" ? str : $examples.value;
-			if (!examples[which]) { which = "Choose Example"; }
-
-			Shader.Editor.setValue(atob(examples[which]));
-			Shader.Editor.gotoLine(0);
-
-			Shader.togglePlayback(false);
-			Shader.playTime = Shader.pauseTime = 0;
-			$time.innerHTML = "0.00";
-			
-			Shader.compile();
-		},
+		/* =============================== */
+		/* ====== TOGGLE FULLSCREEN ====== */
+		/* =============================== */
 
 		toggleFullscreen: function(e) {
 
@@ -271,6 +305,24 @@
 			}
 
 			$canvas.style.borderRadius = Shader.isFullscreen ? "0px" : "5px";
+		},
+
+		/* ========================== */
+		/* ====== LOAD EXAMPLE ====== */
+		/* ========================== */
+
+		loadExample: function(str) {
+			var which = typeof str == "string" ? str : $examples.value;
+			if (!examples[which]) { which = "Choose Example"; }
+
+			Shader.Editor.setValue(atob(examples[which]));
+			Shader.Editor.gotoLine(0);
+
+			Shader.togglePlayback(false);
+			Shader.playTime = Shader.pauseTime = 0;
+			$time.innerHTML = "0.00";
+			
+			Shader.compile();
 		}
 	};
 

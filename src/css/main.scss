@@ -1,3 +1,5 @@
+@import "gh-fork-ribbon.scss";
+
 * { margin: 0px; padding: 0px; }
 *:focus { outline: none; }
 
@@ -68,7 +70,7 @@ table {
 .code-view.error { box-shadow: 0px 0px 0px 2px #F00; }
 
 .icon {
-	background-image: url("../img/icons.svg");
+	background-image: url("img/icons.svg");
 	background-repeat: no-repeat;
 	background-size: 160px 20px;
 
@@ -163,6 +165,9 @@ table {
 	}
 
 	.fps { margin-left: 15px; }
+
+	/* SASS bug workaround */
+	@function saturate($value){@return #{"saturate("+$value+")"};}
 
 	#shader-editor.disabled, #dsp-editor.disabled {
 		-webkit-filter: saturate(0) contrast(0.8);
