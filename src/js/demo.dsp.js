@@ -324,8 +324,8 @@
 			if (!enabled) {
 				navigator.getUserMedia({ audio: true }, function(stream) {
 					DSP.micStream = stream;
-					src = atx.createMediaStreamSource(stream);
-					src.connect(node); src.connect(gain);
+					stream = atx.createMediaStreamSource(stream);
+					stream.connect(node); stream.connect(gain);
 					analyser.disconnect();
 					$mic.className = $mic.className.replace("disabled", "");
 					$code.className += " disabled";
