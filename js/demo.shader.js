@@ -247,6 +247,9 @@
 			Shader.Editor.gotoLine(0);
 
 			Shader.togglePlayback(false);
+			Shader.playTime = Shader.pauseTime = 0;
+			$time.innerHTML = "0.00";
+			
 			Shader.compile();
 		},
 
