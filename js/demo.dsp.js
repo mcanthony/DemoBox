@@ -26,7 +26,7 @@
 	var bfr = document.createElement
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 	
-	var analyser = atx.createAnalyser(); analyser.fftSize = 2048;
+	var analyser = atx.createAnalyser(); analyser.fftSize = 1024;
 	var analyserData = new Uint8Array(analyser.frequencyBinCount);
 
 	var node = atx.createScriptProcessor(bufferSize,2,2);
@@ -101,12 +101,11 @@
 				for (i = 0, l = out0.length; i < l; i++) { out0[i] = out1[i] = f(DSP.time+=increase); }
 			}
 
-			analyser.getByteFrequencyData(analyserData);
 			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
-			if (DSP.diagram == "wave") { analyser.getByteTimeDomainData(analyserData); DSP.displayWave(DSP.micStream ? in0 : out0); }
-			else if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
-			else if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
+			if (DSP.diagram == "wave") { DSP.displayWave(); }
+			else if (DSP.diagram == "spectrum") { DSP.displaySpectrum(); }
+			else if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(); }
 
 			if (DSP.generatingThumbnail) { DSP.generateThumbnail(true); }
 			
@@ -139,7 +138,9 @@
 			}
 		},
 
-		displayWave: function(data) {
+		displayWave: function() {
+
+			analyser.getByteTimeDomainData(analyserData);
 
 			var i, x, y, l = analyserData.length, u = W/l;
 
@@ -160,6 +161,8 @@
 
 		displaySpectrum: function(data) {
 
+			analyser.getByteFrequencyData(analyserData);
+
 			var i, l = analyserData.length, u = W/l;
 
 			ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
@@ -172,6 +175,8 @@
 		},
 
 		displaySpectrogram: function(data) {
+
+			analyser.getByteFrequencyData(analyserData);
 			
 			var i, l = analyserData.length, u = H/l;
 
@@ -186,9 +191,10 @@
 		},
 
 		updateFrequencyTexture: function() {
-			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,0,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, new Uint8Array([].slice.call(analyserData,0,512)));
+			analyser.getByteFrequencyData(analyserData);
+			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,0,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, analyserData);
 			analyser.getByteTimeDomainData(analyserData);
-			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,1,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, new Uint8Array([].slice.call(analyserData,0,512)));
+			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,1,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, analyserData);
 		},
 
 		XSSPreventer: function() {
