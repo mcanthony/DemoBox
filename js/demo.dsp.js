@@ -89,19 +89,16 @@
 
 			if (!DSP.playing) { return; }
 
-			var sample, last, in0, in1, out0, out1;
+			var in0, in1, i, l;
+			var out0 = e.outputBuffer.getChannelData(0);
+			var out1 = e.outputBuffer.getChannelData(1);
 
 			if (DSP.micStream) {
 				in0 = e.inputBuffer.getChannelData(0);
 				in1 = e.inputBuffer.getChannelData(1);
-			}
-
-			out0 = e.outputBuffer.getChannelData(0);
-			out1 = e.outputBuffer.getChannelData(1);
-
-			for (var i = 0, l = out0.length; i < l; i++) {
-				if (DSP.micStream) { sample = in0[i]; out0[i] = out1[i] = 0; }
-				else { sample = out0[i] = out1[i]= f(DSP.time+=increase); }
+				for (i = 0, l = out0.length; i < l; i++) { out0[i] = out1[i] = 0; }
+			} else {
+				for (i = 0, l = out0.length; i < l; i++) { out0[i] = out1[i] = f(DSP.time+=increase); }
 			}
 
 			analyser.getByteFrequencyData(analyserData);
