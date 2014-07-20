@@ -23,10 +23,11 @@
 
 	// Interfaces
 	var ctx = $(".dsp canvas").getContext("2d");
+	var bfr = document.createElement
 	var atx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
 	
 	var analyser = atx.createAnalyser(); analyser.fftSize = 2048;
-	var analyserData = new Float32Array(analyser.frequencyBinCount);
+	var analyserData = new Uint8Array(analyser.frequencyBinCount);
 
 	var node = atx.createScriptProcessor(bufferSize,2,2);
 	var gain = atx.createGain(); gain.gain.value = window.localStorage.getItem("gain") || 0.02;
@@ -106,9 +107,9 @@
 				if (DSP.diagram == "wave") { DSP.displayWave(sample,i); }
 			}
 
-			analyser.getFloatFrequencyData(analyserData);
-			//Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency, [].slice.call(analyserData,0,512));
+			analyser.getByteFrequencyData(analyserData);
 			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
+			DSP.updateFrequencyTexture();
 
 			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
 			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
@@ -169,7 +170,7 @@
 			ctx.beginPath();
 
 			for(i = 0; i < l; i++) {
-				ctx.rect(i*u,H-40,u*2,-(HH+analyserData[i]));
+				ctx.rect(i*u,HH,u*2,-analyserData[i]);
 			}
 
 			ctx.fill();
@@ -180,11 +181,15 @@
 			var i, l = analyserData.length, u = H/l;
 
 			for(i = 0; i < l; i++) {
-				ctx.fillStyle = "hsl(" + analyserData[i] + ",80%,50%)";
+				ctx.fillStyle = "rgba(0,255,153," + (analyserData[i]/256) + ")";
 				ctx.fillRect(ftcount%W,u*i*0.9,1,1);
 			}
 
 			ftcount++;
+		},
+
+		updateFrequencyTexture: function() {
+			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,0,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, new Uint8Array([].slice.call(analyserData,0,512)));
 		},
 
 		XSSPreventer: function() {
@@ -221,7 +226,7 @@
 			$script.innerHTML = "try{window.f=function(r){"+DSP.XSSPreventer()+codeValue+"\n;return f}("+sampleRate+")}catch(e){DSP.error(e)}";
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); window.location.search = ""; }
+			if (e) { window.location.hash = btoa(Demo.Shader.Editor.getValue()) + ";" + btoa(codeValue); }
 			
 			// Append the script
 			document.body.appendChild($script);

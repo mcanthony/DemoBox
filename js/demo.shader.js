@@ -2,10 +2,10 @@
 
 	var gl = null;
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
-	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform float iSync;\n"
+	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform sampler2D iFrequency;uniform float iSync;\n"
 
 	var examples = {
-		"Choose Example": "LyoqCiAqIEZyYWdtZW50LVNoYWRlciAoT3BlbkdMIEVTIDIuMCkKICogIAogKiB2ZWMyICBpUmVzb2x1dGlvbiAvLyBjYW52YXMgcmVzb2x1dGlvbiBpbiBwaXhlbHMKICogZmxvYXQgaUdsb2JhbFRpbWUgLy8gcGxheWJhY2sgdGltZSBpbiBzZWNvbmRzCiAqIGZsb2F0IGlTeW5jICAgICAgIC8vIEN1cnJlbnQgRFNQIHBsYXliYWNrIHRpbWUgaW4gc2Vjb25kcwogKi8KCnZvaWQgbWFpbigpCnsKCXZlYzIgdXYgPSBnbF9GcmFnQ29vcmQueHkgLyBpUmVzb2x1dGlvbi54eTsKCWdsX0ZyYWdDb2xvciA9IHZlYzQodXYsc2luKGlHbG9iYWxUaW1lKSwxLjApOwp9",
+		"Choose Example": "LyoqCiAqIEZyYWdtZW50LVNoYWRlciAoT3BlbkdMIEVTIDIuMCkKICogIAogKiB2ZWMyICAgICAgaVJlc29sdXRpb24gLy8gY2FudmFzIHJlc29sdXRpb24gaW4gcGl4ZWxzCiAqIGZsb2F0ICAgICBpR2xvYmFsVGltZSAvLyBwbGF5YmFjayB0aW1lIGluIHNlY29uZHMKICogZmxvYXQgICAgIGlTeW5jICAgICAgIC8vIEN1cnJlbnQgRFNQIHBsYXliYWNrIHRpbWUgaW4gc2Vjb25kcwogKiBzYW1wbGVyMkQgaUZyZXF1ZW5jeSAgLy8gQ3VycmVudCBmcmVxdWVuY2llcyBmcm9tIDAgdG8gMjU2CiAqLwoKdm9pZCBtYWluKCkKewoJdmVjMiB1diA9IGdsX0ZyYWdDb29yZC54eSAvIGlSZXNvbHV0aW9uLnh5OwoJZ2xfRnJhZ0NvbG9yID0gdmVjNCh1dixzaW4oaUdsb2JhbFRpbWUpLDEuMCk7Cn0=",
 		"2D Voroni": "Y29uc3QgaW50IE4gPSAyMDA7CnZlYzIgcG9pbnRzW05dOwoKdmVjMiBub2lzZSh2ZWMyIGNvKXsKICAgIHJldHVybiB2ZWMyKAoJCWZyYWN0KHNpbihkb3QoY28ueHkgLHZlYzIoMTIuOTg5OCw3OC4yMzMpKSkgKiA0Mzc1OC41NDUzKSwKCQlmcmFjdChjb3MoZG90KGNvLnl4ICx2ZWMyKDEyLjk4OTgsNDM3NTguNTQ1MykpKSAqIDc4LjIzMykKCSk7Cn0KCnZvaWQgZ2VuZXJhdGVQb2ludHMoKQp7CQoJZmxvYXQgbiA9IDAuMDsKCQoJZm9yKGludCBpID0gMDsgaSA8IE47IGkrKykKCXsKCQlwb2ludHNbaV0gPSBub2lzZSh2ZWMyKG4pKTsJCQoJCW4gKz0gMS4wL2Zsb2F0KE4pOwoJfQp9CgpmbG9hdCB2b3JvbmkodmVjMiB1dikKewoJZmxvYXQgZGlzdCA9IDEuMDsKCQoJZm9yKGludCBpID0gMDsgaSA8IE47IGkrKykKCXsgZGlzdCA9IG1pbihkaXN0LCBsZW5ndGgodXYtcG9pbnRzW2ldKSk7IH0KCglyZXR1cm4gMS4wIC0gZGlzdCoxMC4wOwp9Cgp2b2lkIG1haW4oKQp7CQoJZ2VuZXJhdGVQb2ludHMoKTsKCQoJdmVjMiB1diA9IGdsX0ZyYWdDb29yZC54eSAvIGlSZXNvbHV0aW9uLnh5OwoJdmVjMyBjb2wgPSB2ZWMzKHZvcm9uaSh1dikpOwoJCglnbF9GcmFnQ29sb3IgPSB2ZWM0KGNvbCwxLjApOwp9",
 		"2D Perlin": "I2RlZmluZSBOIDIwCiNkZWZpbmUgVSAxLjAvZmxvYXQoTikKCQp2ZWMyIG5vaXNlKHZlYzIgY28pewogICAgcmV0dXJuICh2ZWMyKAoJCWZyYWN0KHNpbihkb3QoY28ueHkgLHZlYzIoMTIuOTg5OCw3OC4yMzMpKSkgKiA0Mzc1OC41NDUzKSwKCQlmcmFjdChjb3MoZG90KGNvLnl4ICx2ZWMyKDEyLjk4OTgsNDM3NTguNTQ1MykpKSAqIDc4LjIzMykKCSktMC41KSoyLjA7Cn0KCmZsb2F0IGYoZmxvYXQgdCkgeyByZXR1cm4gNi4wKnQqdCp0KnQqdC0xNS4wKnQqdCp0KnQrMTAuMCp0KnQqdDsgfQoKZmxvYXQgcGVybGluKHZlYzIgcCkKewoJZmxvYXQgaSA9IGZsb29yKHAueCk7CglmbG9hdCBqID0gZmxvb3IocC55KTsKCQoJZmxvYXQgdSA9IHAueCAtIGk7CglmbG9hdCB2ID0gcC55IC0gajsKCQoJdmVjMiBnMDAgPSBub2lzZSh2ZWMyKGkgICAgLCBqICAgICkpOwoJdmVjMiBnMDEgPSBub2lzZSh2ZWMyKGkgICAgLCBqKzEuMCkpOwoJdmVjMiBnMTAgPSBub2lzZSh2ZWMyKGkrMS4wLCBqICAgICkpOwoJdmVjMiBnMTEgPSBub2lzZSh2ZWMyKGkrMS4wLCBqKzEuMCkpOwoJCglmbG9hdCBxMDAgPSBnMDAueCoodSAgICApICsgZzAwLnkqKHYgICAgKTsKCWZsb2F0IHEwMSA9IGcwMS54Kih1ICAgICkgKyBnMDEueSoodi0xLjApOwoJZmxvYXQgcTEwID0gZzEwLngqKHUtMS4wKSArIGcxMC55Kih2ICAgICk7CglmbG9hdCBxMTEgPSBnMTEueCoodS0xLjApICsgZzExLnkqKHYtMS4wKTsKCQoJZmxvYXQgcXgwID0gcTAwKigxLjAtZih1KSkgKyBxMTAqZih1KTsKCWZsb2F0IHF4MSA9IHEwMSooMS4wLWYodSkpICsgcTExKmYodSk7CglmbG9hdCBxeHkgPSBxeDAqKDEuMC1mKHYpKSArIHF4MSpmKHYpOwoKCXJldHVybiBxeHkrMC41Owp9Cgp2b2lkIG1haW4oKQp7Cgl2ZWMzIGNvbCA9IHZlYzMocGVybGluKGdsX0ZyYWdDb29yZC54eS9VLWlHbG9iYWxUaW1lKjUuMCkpOwoJZ2xfRnJhZ0NvbG9yID0gdmVjNChjb2wsMS4wKTsKfQ==",
 		"2D Fractals": "I2RlZmluZSBOIDEwMC4wIC8vIEl0ZXJhdGlvbnMKI2RlZmluZSBaICAgMi4wIC8vIFpvb20KI2RlZmluZSBNIGZhbHNlIC8vIE1hbmRlbGJyb3QKCnZvaWQgbWFpbigpCnsKCXZlYzMgZCA9IHZlYzMoMSk7IHZlYzIgYyA9IHZlYzIoLTAuNzksMC4yKTsKCXZlYzIgeiA9ICgyLjAgKiBnbF9GcmFnQ29vcmQueHkgLSBpUmVzb2x1dGlvbi54eSkgLyBpUmVzb2x1dGlvbi54eCAqIFo7CglpZiAoTSkgeyBjID0gejsgeiA9IHZlYzIoMCk7IH0KCglmb3IoZmxvYXQgaT0wLjA7aTxOO2krPTEuMCkKCXsKCQl6ID0gdmVjMih6Lngqei54LXoueSp6LnksMi4wKnoueCp6LnkpK2M7CgkJaWYgKGxlbmd0aCh6KT4yLjApIHsgZCA9IHZlYzMoaS9OKTsgYnJlYWs7IH0KCX0KCQoJZ2xfRnJhZ0NvbG9yID0gdmVjNCgzLjAqZCp2ZWMzKGdsX0ZyYWdDb29yZC54eS9pUmVzb2x1dGlvbi54eSxpU2FtcGxlKjAuMSkrdmVjMygwLjA3KSwxLjApOwp9",
@@ -112,7 +112,7 @@
 			// Setup uniforms
 			Shader.iGlobalTime = gl.getUniformLocation(program, "iGlobalTime");
 			Shader.iResolution = gl.getUniformLocation(program, "iResolution");
-			//Shader.iFrequency  = gl.getUniformLocation(program, "iFrequency");
+			Shader.iFrequency  = gl.getUniformLocation(program, "iFrequency");
 			Shader.iSync       = gl.getUniformLocation(program, "iSync");
 
 			// Setup rectangle vertices
@@ -121,14 +121,21 @@
 			gl.enableVertexAttribArray(Shader.bfr);
 
 			// Prefill iFrequency array
-			//gl.uniform1fv(Shader.iFrequency, new Float32Array(511));
+			gl.bindTexture(gl.TEXTURE_2D, Shader.frequencyTexture = gl.createTexture());
+
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,     gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,     gl.CLAMP_TO_EDGE);
+
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 512, 1, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, new Uint8Array(512));
 
 			// Setup viewport
 			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 			// Update the URL hash if the code was parsed due to a user event
-			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.DSP.Editor.getValue()); window.location.search = ""; }
+			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.DSP.Editor.getValue()); }
 
 			var err = gl.getError();
 
