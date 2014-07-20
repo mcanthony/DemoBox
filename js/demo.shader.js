@@ -64,8 +64,8 @@
 			Shader.gl = gl;
 
 			// Setup view, compile and run
-			Shader.compile();
 			Shader.pause = true;
+			Shader.compile();
 			Shader.canvasSetup();
 
 			// Register event-listeners
@@ -246,10 +246,8 @@
 			Shader.Editor.setValue(atob(examples[which]));
 			Shader.Editor.gotoLine(0);
 
+			Shader.pause = true;
 			Shader.compile();
-			Shader.togglePlayback(true);
-			Shader.pauseTime = 0;
-			Shader.playTime = new Date().getTime();
 		},
 
 		toggleFullscreen: function(e) {
