@@ -246,7 +246,7 @@
 			Shader.Editor.setValue(atob(examples[which]));
 			Shader.Editor.gotoLine(0);
 
-			Shader.pause = true;
+			Shader.togglePlayback(false);
 			Shader.compile();
 		},
 
