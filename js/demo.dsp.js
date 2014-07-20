@@ -170,7 +170,7 @@
 			ctx.fillStyle = lineColor;
 			ctx.beginPath();
 
-			for(i = 0; i < l; i++) { ctx.rect(i*u,HH,u*2,-analyserData[i]); }
+			for(i = 0; i < l; i++) { ctx.rect(i*u,H-40,u*2,-analyserData[i]); }
 
 			ctx.fill();
 		},
@@ -323,7 +323,6 @@
 			DSP.Editor.setTheme("ace/theme/monokai");
 			DSP.Editor.getSession().setMode("ace/mode/javascript");
 			DSP.Editor.setShowPrintMargin(false);
-			DSP.Editor.getSession().setUseWrapMode(true);
 
 			DSP.Editor.commands.addCommand({
 				name: 'compile',
