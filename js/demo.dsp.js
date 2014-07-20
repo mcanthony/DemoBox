@@ -107,7 +107,7 @@
 			}
 
 			analyser.getFloatFrequencyData(analyserData);
-			Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency, [].slice.call(analyserData,0,512));
+			//Demo.Shader.gl.uniform1fv(Demo.Shader.iFrequency, [].slice.call(analyserData,0,512));
 			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
 
 			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
