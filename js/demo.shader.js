@@ -243,6 +243,8 @@
 			Shader.Editor.setValue(atob(examples[which]));
 			Shader.Editor.gotoLine(0);
 
+			window.cancelAnimationFrame(Shader.animationRequest);
+
 			Shader.compile();
 			Shader.togglePlayback(true);
 			Shader.pauseTime = 0;
