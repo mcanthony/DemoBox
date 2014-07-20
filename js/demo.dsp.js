@@ -159,7 +159,7 @@
 			ctx.stroke();
 		},
 
-		displaySpectrum: function(data) {
+		displaySpectrum: function() {
 
 			analyser.getByteFrequencyData(analyserData);
 
@@ -174,7 +174,7 @@
 			ctx.fill();
 		},
 
-		displaySpectrogram: function(data) {
+		displaySpectrogram: function() {
 
 			analyser.getByteFrequencyData(analyserData);
 			
