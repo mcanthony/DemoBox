@@ -109,11 +109,12 @@
 
 			analyser.getByteFrequencyData(analyserData);
 			Demo.Shader.gl.uniform1f(Demo.Shader.iSync, DSP.time);
-			DSP.updateFrequencyTexture();
 
 			if (DSP.diagram == "spectrum") { DSP.displaySpectrum(DSP.micStream ? in0 : out0); }
 			if (DSP.diagram == "spectrogram") { DSP.displaySpectrogram(DSP.micStream ? in0 : out0); }
 			if (DSP.generatingThumbnail) { DSP.generateThumbnail(true); }
+			
+			DSP.updateFrequencyTexture();
 		},
 
 		canvasSetup: function() {
@@ -190,6 +191,8 @@
 
 		updateFrequencyTexture: function() {
 			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,0,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, new Uint8Array([].slice.call(analyserData,0,512)));
+			analyser.getByteTimeDomainData(analyserData);
+			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,1,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, new Uint8Array([].slice.call(analyserData,0,512)));
 		},
 
 		XSSPreventer: function() {
