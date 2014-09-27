@@ -3,7 +3,7 @@ DemoBox
 
 A tool developed for creating [demos](https://en.wikipedia.org/wiki/Demo_(computer_programming)) using the latest HTML5 APIs.
 
-* [**Demo**](http://elias-schuett.de/git/DemoBox)  
+* [**Demo**](http://apps.elias.media/DemoBox)  
 * [**Introduction**](https://github.com/elias94xx/DemoBox/blob/master/INTRODUCTION.md)  
 * [**License**](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
