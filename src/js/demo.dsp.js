@@ -59,8 +59,8 @@
 		/* ====== INIT ====== */
 		/* ================== */
 
-		init: function(example) {
-
+		init: function(example)
+		{
 			DSP.example = examples[example] ? example : "Choose Example";
 			$examples.value = DSP.example;
 
@@ -96,8 +96,8 @@
 		/* ====== SETUP EDITOR ====== */
 		/* ========================== */
 
-		setupEditor: function() {
-
+		setupEditor: function()
+		{
 			DSP.Editor = ace.edit("dsp-editor");
 			DSP.Editor.setTheme("ace/theme/monokai");
 			DSP.Editor.getSession().setMode("ace/mode/javascript");
@@ -120,8 +120,8 @@
 		/* ====== CAVAS SETUP ====== */
 		/* ========================= */
 
-		setupCanvas: function() {
-
+		setupCanvas: function()
+		{
 			// Update with and height variables
 			W = ctx.canvas.width = $view.offsetWidth;   HW = W>>1;
 			H = ctx.canvas.height = $view.offsetHeight; HH = H>>1;
@@ -138,8 +138,8 @@
 		/* ====== PARSE CODE ====== */
 		/* ======================== */
 
-		parseCode: function(e) {
-
+		parseCode: function(e)
+		{
 			// Listen for nested errors which try-catch can'DSP.time find
 			window.onerror = DSP.error;
 			var codeValue = DSP.Editor.getValue();
@@ -170,19 +170,22 @@
 		/* ====== PROCESS ====== */
 		/* ===================== */
 
-		process: function(e) {
-
+		process: function(e)
+		{
 			if (!DSP.playing) { return; }
 
 			var in0, in1, i, l;
 			var out0 = e.outputBuffer.getChannelData(0);
 			var out1 = e.outputBuffer.getChannelData(1);
 
-			if (DSP.micStream) {
+			if (DSP.micStream)
+			{
 				in0 = e.inputBuffer.getChannelData(0);
 				in1 = e.inputBuffer.getChannelData(1);
 				for (i = 0, l = out0.length; i < l; i++) { out0[i] = out1[i] = 0; }
-			} else {
+			}
+			else
+			{
 				for (i = 0, l = out0.length; i < l; i++) { out0[i] = out1[i] = f(DSP.time+=increase); }
 			}
 
@@ -201,8 +204,8 @@
 		/* ====== PREVIEW DIAGRAM ====== */
 		/* ============================= */
 
-		previewDiagram: function(stop) {
-
+		previewDiagram: function(stop)
+		{
 			if (stop === true) {
 				if (!DSP.playState) { analyser.disconnect(); }
 				DSP.playing = DSP.playState;
@@ -226,13 +229,14 @@
 		/* ====== SELECT DIAGRAM ====== */
 		/* ============================ */
 
-		selectDiagram: function(e) {
-
+		selectDiagram: function(e)
+		{
 			DSP.diagram = e.target.getAttribute("data-type");
 			e.target.parentElement.children.addClass("disabled");
 			e.target.removeClass("disabled");
 
-			if (DSP.diagram == "spectrogram") {
+			if (DSP.diagram == "spectrogram")
+			{
 				ftcount = 0;
 				ctx.fillStyle = "#111"; ctx.fillRect(0,0,W,H);
 			}
@@ -242,8 +246,8 @@
 		/* ====== DISPLAY WAVE ====== */
 		/* ========================== */
 
-		displayWave: function() {
-
+		displayWave: function()
+		{
 			analyser.getByteTimeDomainData(analyserData);
 
 			var i, x, y, l = analyserData.length, u = W/l;
@@ -253,7 +257,8 @@
 
 			ctx.beginPath();
 
-			for(i = 0; i < l; i++) {
+			for(i = 0; i < l; i++)
+			{
 				x = (i/l)*W;
 				y = HH-analyserData[i]/255*waveSize+waveSize/2;
 				if (i === 0) { ctx.moveTo(x,y); }
@@ -267,8 +272,8 @@
 		/* ====== DISPLAY SPECTRUM ====== */
 		/* ============================== */
 
-		displaySpectrum: function() {
-
+		displaySpectrum: function()
+		{
 			analyser.getByteFrequencyData(analyserData);
 
 			var i, l = analyserData.length, u = W/l;
@@ -286,13 +291,14 @@
 		/* ====== DISPLAY SPECTROGRAM ====== */
 		/* ================================= */
 
-		displaySpectrogram: function() {
-
+		displaySpectrogram: function()
+		{
 			analyser.getByteFrequencyData(analyserData);
 			
 			var i, l = analyserData.length, u = H/l;
 
-			for(i = 0; i < l; i++) {
+			for(i = 0; i < l; i++)
+			{
 				ctx.fillStyle = "#111";
 				ctx.fillRect(ftcount%W,H-u*i*0.95-40,1,1);
 				ctx.fillStyle = "rgba(0,255,153," + (analyserData[i]/255) + ")";
@@ -306,7 +312,8 @@
 		/* ====== UPDATE DATA TEXTURE ====== */
 		/* ================================= */
 
-		updateDataTexture: function() {
+		updateDataTexture: function()
+		{
 			analyser.getByteFrequencyData(analyserData);
 			Demo.Shader.gl.texSubImage2D(Demo.Shader.gl.TEXTURE_2D,0,0,0,512,1,Demo.Shader.gl.LUMINANCE,Demo.Shader.gl.UNSIGNED_BYTE, analyserData);
 			analyser.getByteTimeDomainData(analyserData);
@@ -317,12 +324,14 @@
 		/* ====== TOGGLE MIC ====== */
 		/* ======================== */
 
-		toggleMic: function(e) {
-
+		toggleMic: function(e)
+		{
 			var enabled = $mic.className.indexOf("disabled") == -1;
 
-			if (!enabled) {
-				navigator.getUserMedia({ audio: true }, function(stream) {
+			if (!enabled)
+			{
+				navigator.getUserMedia({ audio: true }, function(stream)
+				{
 					DSP.micStream = stream;
 					stream = atx.createMediaStreamSource(stream);
 					stream.connect(node); stream.connect(gain);
@@ -330,7 +339,9 @@
 					$mic.className = $mic.className.replace("disabled", "");
 					$code.className += " disabled";
 				}, function(e) { alert("Access denied"); });
-			} else {
+			}
+			else
+			{
 				DSP.micStream.stop();
 				DSP.micStream = false;
 				analyser.connect(atx.destination);
@@ -343,13 +354,16 @@
 		/* ====== XSS Preventer ====== */
 		/* =========================== */
 
-		XSSPreventer: function() {
+		XSSPreventer: function()
+		{
 
 			var keys = [], key;
 			
 			// Gather all disallowed variables
-			for (key in window) {
-				if (allowedVariables.indexOf(key) == -1) {
+			for (key in window)
+			{
+				if (allowedVariables.indexOf(key) == -1)
+				{
 					keys.push(key);
 				}
 			}
@@ -362,9 +376,10 @@
 		/* ====== TOGGLE PLAYBACK ====== */
 		/* ============================= */
 
-		togglePlayback: function(e) {
-
-			if (!warned) {
+		togglePlayback: function(e)
+		{
+			if (!warned)
+			{
 				if (confirm("The playback volume currently varies greatly from system to system. Please turn your speakers down before continuing."))
 				{ warned = true; window.localStorage.setItem("warned", "true"); }
 				else { return; }
@@ -372,12 +387,13 @@
 
 			DSP.playing = typeof e == "object" ? !DSP.playing : e;
 
-			if (DSP.playing) {
-
+			if (DSP.playing)
+			{
 				timer = window.setInterval(DSP.updateInfo, 100);
 				analyser.connect(atx.destination);
-
-			} else {
+			}
+			else
+			{
 				window.clearInterval(timer);
 				analyser.disconnect();
 			}
@@ -390,7 +406,8 @@
 		/* ====== RESET ====== */
 		/* =================== */
 
-		reset: function() {
+		reset: function()
+		{
 			$time.innerHTML = "0.00"; DSP.time = 0;
 		},
 
@@ -398,7 +415,8 @@
 		/* ====== ERROR ====== */
 		/* =================== */
 
-		error: function(e) {
+		error: function(e)
+		{
 			$codeView.className += " error";
 		},
 
@@ -406,7 +424,8 @@
 		/* ====== UPDATE INFO ====== */
 		/* ========================= */
 
-		updateInfo: function() {
+		updateInfo: function()
+		{
 			$time.innerHTML = ((DSP.time*(1/increase))/sampleRate).toFixed(2);
 		},
 
@@ -414,7 +433,8 @@
 		/* ====== CHANGE GAIN ====== */
 		/* ========================= */
 
-		changeGain: function(e) {
+		changeGain: function(e)
+		{
 			var val = e.target.value;
 			gain.gain.value = val;
 			window.localStorage.setItem("gain", val);
@@ -424,7 +444,8 @@
 		/* ====== LOAD EXAMPLE ====== */
 		/* ========================== */
 
-		loadExample: function(str) {
+		loadExample: function(str)
+		{
 			var which = typeof str == "string" ? str : $examples.value;
 			if (!examples[which]) { which = "Choose Example"; }
 

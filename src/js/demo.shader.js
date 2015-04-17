@@ -4,7 +4,7 @@
 
 	var gl = null;
 	var vsc = "attribute vec2 aPos;void main(){gl_Position=vec4(aPos.x,aPos.y,0.0,1.0);}";
-	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform sampler2D iDSP;uniform float iSync;\n"
+	var fss = "precision mediump float;uniform vec2 iResolution;uniform float iGlobalTime;uniform sampler2D iDSP;uniform float iSync;\n";
 
 	var examples = {
 		"Choose Example": "LyoqCiAqIEZyYWdtZW50LVNoYWRlciAoT3BlbkdMIEVTIDIuMCkKICogIAogKiB2ZWMyICAgICAgaVJlc29sdXRpb24gLy8gY2FudmFzIHJlc29sdXRpb24gaW4gcGl4ZWxzCiAqIGZsb2F0ICAgICBpR2xvYmFsVGltZSAvLyBwbGF5YmFjayB0aW1lIGluIHNlY29uZHMKICogZmxvYXQgICAgIGlTeW5jICAgICAgIC8vIEN1cnJlbnQgRFNQIHBsYXliYWNrIHRpbWUgaW4gc2Vjb25kcwogKiBzYW1wbGVyMkQgaURTUCAgICAgICAgLy8gQ29udGFpbnMgZnJlcXVlbmN5IGFuZCB3YXZlIGRhdGEKICovCgp2b2lkIG1haW4oKQp7Cgl2ZWMyIHV2ID0gZ2xfRnJhZ0Nvb3JkLnh5IC8gaVJlc29sdXRpb24ueHk7CglnbF9GcmFnQ29sb3IgPSB2ZWM0KHV2LHNpbihpR2xvYmFsVGltZSksMS4wKTsKfQ==",
@@ -27,23 +27,26 @@
 	var $time       = $(".shader .time");
 	var $fps        = $(".shader .fps");
 	var $examples   = $(".shader .examples");
+	var $resolution = $(".shader .resolution");
 	var $fullscreen = $(".shader .fullscreen");
 
 	var Shader = Demo.Shader = {
 
-		time: 0,
-		pause: false,
-		frameNumber: 0,
-		playTime: 0,
+		paused: true,
+		playStart: 0,
+		pauseStart: 0,
 		pauseTime: 0,
+
+		resolution: 1,
+		frameNumber: 0,
 		fpsStartTime: 0,
 
 		/* ========================= */
 		/* ====== GET CONTEXT ====== */
 		/* ========================= */
 
-		getContext: function(canvas) {
-
+		getContext: function(canvas)
+		{
 			var ctx = null;
 			var contextIds = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 			var attributes = { alpha: false, depth: false, antialias: false, stencil: false, premultipliedAlpha: false, preserveDrawingBuffer: false };
@@ -60,10 +63,11 @@
 		/* ====== INIT ====== */
 		/* ================== */
 
-		init: function(example) {
-
+		init: function(example)
+		{
 			gl = Shader.getContext($canvas);
 
+			// Load example
 			Shader.example = examples[example] ? example : "Choose Example";
 			$examples.value = Shader.example;
 
@@ -74,7 +78,6 @@
 			Shader.gl = gl;
 
 			// Setup view, compile and run
-			Shader.pause = true;
 			Shader.compile();
 			Shader.setupCanvas();
 
@@ -84,6 +87,7 @@
 			$reset.addEventListener("click", Shader.reset, false);
 			$fullscreen.addEventListener("click", Shader.toggleFullscreen, false);
 			$examples.addEventListener("change", Shader.loadExample, false);
+			$resolution.addEventListener("change", Shader.setResolution, false);
 			window.addEventListener("resize", Shader.setupCanvas, false);
 		},
 
@@ -91,13 +95,13 @@
 		/* ====== COMPILE ====== */
 		/* ===================== */
 
-		compile: function(e) {
-
+		compile: function(e)
+		{
 			// Stop rendering
 			window.cancelAnimationFrame(Shader.animationRequest);
 
 			// Remove error class
-			$codeView.className = $codeView.className.replace("error", "");
+			$codeView.className = $codeView.className.replace(/ error/g, "");
 
 			// Get glsl code
 			var codeValue = Shader.Editor.getValue();
@@ -148,25 +152,27 @@
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, 512, 2, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, null);
 
 			// Setup viewport
-			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
-			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+			gl.uniform2f(Shader.iResolution, $canvas.width, $canvas.height);
+			gl.viewport(0, 0, $canvas.width, $canvas.height);
+			gl.vertexAttribPointer(Shader.aPos, 2, gl.FLOAT, false, 0, 0);
 
 			// Update the URL hash if the code was parsed due to a user event
 			if (e) { window.location.hash = btoa(codeValue) + ";" + btoa(Demo.DSP.Editor.getValue()); }
 
 			var err = gl.getError();
+			while(gl.getError()){}
 
 			// Check for errors, else start rendering
-			if (err&&err!=gl.INVALID_VALUE) { Shader.error(); }
-			else { Shader.render(); }
+			if (err) { $codeView.className += " error"; }
+			else { Shader.reset(); }
 		},
 
 		/* ========================== */
 		/* ====== SETUP EDITOR ====== */
 		/* ========================== */
 
-		setupEditor: function() {
-
+		setupEditor: function()
+		{
 			Shader.Editor = ace.edit("shader-editor");
 			Shader.Editor.setTheme("ace/theme/monokai");
 			Shader.Editor.getSession().setMode("ace/mode/glsl");
@@ -189,97 +195,111 @@
 		/* ====== SETUP CANVAS ====== */
 		/* ========================== */
 
-		setupCanvas: function() {
+		setupCanvas: function()
+		{
+			$canvas.width = (Shader.isFullscreen ? window.innerWidth : $view.offsetWidth) * Shader.resolution;
+			$canvas.height = (Shader.isFullscreen ? window.innerHeight : $view.offsetHeight) * Shader.resolution;
 
-			// Update with and height
-			gl.canvas.width = Shader.isFullscreen ? window.innerWidth : $view.offsetWidth;
-			gl.canvas.height = Shader.isFullscreen ? window.innerHeight : $view.offsetHeight;
+			gl.uniform2f(Shader.iResolution, $canvas.width, $canvas.height);
+			gl.viewport(0, 0, $canvas.width, $canvas.height);
 
-			// Update uniform and viewport
-			gl.uniform2f(Shader.iResolution, gl.canvas.width, gl.canvas.height);
-			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-			Shader.render();
+			Shader.snapshot();
 		},
 
 		/* ==================== */
 		/* ====== RENDER ====== */
 		/* ==================== */
 
-		render: function() {
+		render: function()
+		{
+			Shader.animationRequest = !Shader.paused && window.requestAnimationFrame(Shader.render);
 
-			Shader.animationRequest = !Shader.pause && window.requestAnimationFrame(Shader.render);
-			Shader.time = (new Date().getTime() - Shader.playTime) / 1000;
-
-			gl.uniform1f(Shader.iGlobalTime, Shader.time);
-			gl.vertexAttribPointer(Shader.aPos, 2, gl.FLOAT, false, 0, 0);
+			gl.uniform1f(Shader.iGlobalTime, (new Date().getTime()-Shader.playStart-Shader.pauseTime)/1000);
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-			Shader.fps = Shader.getFPS();
+			Shader.measureFPS();
+		},
+
+		/* ====================== */
+		/* ====== SNAPSHOT ====== */
+		/* ====================== */
+
+		snapshot: function()
+		{
+			gl.drawArrays(gl.TRIANGLES, 0, 6);
 		},
 
 		/* ===================== */
 		/* ====== GET FPS ====== */
 		/* ===================== */
 
-		getFPS: function() {
+		measureFPS: function() {
 
-			var interval = (new Date().getTime()-Shader.fpsStartTime)/1000;
+			var interval = (new Date().getTime()-Shader.fpsStartTime);
 
-			if (interval>1) {
+			if (interval>1000)
+			{
 				Shader.fpsStartTime = new Date().getTime();
+				Shader.fps = Shader.frameNumber;
 				Shader.frameNumber = 0;
 			}
 
-			return Math.min(Math.floor(++Shader.frameNumber/interval),60);
+			Shader.frameNumber++;
+
+			return Shader.fps;
 		},
 
 		/* ============================= */
 		/* ====== TOGGLE PLAYBACK ====== */
 		/* ============================= */
 
-		togglePlayback: function(e) {
+		togglePlayback: function(e)
+		{
+			if (!Shader.playStart) { Shader.playStart = new Date().getTime(); }
+			Shader.paused = typeof e == "boolean" ? !e : !Shader.paused;
 
-			if (typeof e == "boolean") { Shader.pause = !e; }
-			else { Shader.pause = !Shader.pause; }
+			if (!Shader.paused)
+			{
+				if (Shader.pauseStart)
+				{ Shader.pauseTime += new Date().getTime() - Shader.pauseStart; }
 
-			if (!Shader.pause) {
-				Shader.playTime += new Date().getTime() - Shader.pauseTime;
-				Shader.updateTimer = window.setInterval(Shader.updateInfo, 100);
+				Shader.timerInterval = window.setInterval(Shader.updateTimer, 100);
 				Shader.render();
-			} else {
-				Shader.pauseTime = new Date().getTime();
-				window.clearInterval(Shader.updateTimer);
+			}
+			else
+			{
+				Shader.pauseStart = new Date().getTime();
+				window.clearInterval(Shader.timerInterval);
 			}
 
-			$play.setAttribute("data-status", Shader.pause ? "0" : "1");
-			$play.style.backgroundPosition = Shader.pause ? "0px 0px" : "-20px 0px";
+			$play.setAttribute("data-status", Shader.paused ? "0" : "1");
+			$play.style.backgroundPosition = Shader.paused ? "0px 0px" : "-20px 0px";
 		},
 
 		/* =================== */
 		/* ====== RESET ====== */
 		/* =================== */
 
-		reset: function() {
+		reset: function()
+		{
 			$time.innerHTML = "0.00";
-			if (Shader.pause){ Shader.playTime = Shader.pauseTime = 0; }
-			else { Shader.playTime = new Date().getTime(); }
+
+			Shader.fpsStartTime = new Date().getTime();
+			Shader.frameNumber = 0;
+
+			Shader.playStart = Shader.paused ? 0 : new Date().getTime();
+			Shader.pauseStart = 0;
+			Shader.pauseTime = 0;
+			Shader.paused && Shader.render();
 		},
 
-		/* =================== */
-		/* ====== ERROR ====== */
-		/* =================== */
+		/* ========================== */
+		/* ====== UPDATE TIMER ====== */
+		/* ========================== */
 
-		error: function(e) {
-			$codeView.className += " error";
-		},
-
-		/* ========================= */
-		/* ====== UPDATE INFO ====== */
-		/* ========================= */
-
-		updateInfo: function() {
-			$time.innerHTML = Shader.time.toFixed(2);
+		updateTimer: function()
+		{
+			$time.innerHTML = ((new Date().getTime()-Shader.playStart-Shader.pauseTime)/1000).toFixed(2);
 			$fps.innerHTML = (Shader.fps<9?"0"+Shader.fps:Shader.fps) + " FPS";
 		},
 
@@ -287,17 +307,19 @@
 		/* ====== TOGGLE FULLSCREEN ====== */
 		/* =============================== */
 
-		toggleFullscreen: function(e) {
-
+		toggleFullscreen: function(e)
+		{
 			Shader.isFullscreen = document.fullscreen || document.mozFullScreen || document.webkitIsFullScreen;
 
-			if (!Shader.isFullscreen) {
+			if (!Shader.isFullscreen)
+			{
 				if ($canvas.requestFullscreen) { $canvas.requestFullscreen(); }
 				else if ($canvas.mozRequestFullScreen) { $canvas.mozRequestFullScreen(); }
 				else if ($canvas.webkitRequestFullscreen) { $canvas.webkitRequestFullscreen(); }
 			}
 
-			if (!Shader.toggleFullscreen.listening) {
+			if (!Shader.toggleFullscreen.listening)
+			{
 				Shader.toggleFullscreen.listening = true;
 				$canvas.addEventListener("fullscreenchange", Shader.toggleFullscreen, false);
 				$canvas.addEventListener("mozfullscreenchange", Shader.toggleFullscreen, false);
@@ -311,7 +333,8 @@
 		/* ====== LOAD EXAMPLE ====== */
 		/* ========================== */
 
-		loadExample: function(str) {
+		loadExample: function(str)
+		{
 			var which = typeof str == "string" ? str : $examples.value;
 			if (!examples[which]) { which = "Choose Example"; }
 
@@ -319,10 +342,25 @@
 			Shader.Editor.gotoLine(0);
 
 			Shader.togglePlayback(false);
-			Shader.playTime = Shader.pauseTime = 0;
-			$time.innerHTML = "0.00";
-			
+			Shader.reset();
 			Shader.compile();
+		},
+
+		/* ============================ */
+		/* ====== SET RESOLUTION ====== */
+		/* ============================ */
+
+		setResolution: function(e)
+		{
+			var f = Shader.resolution = $resolution.value;
+			
+			$canvas.width = $view.offsetWidth*f;
+			$canvas.height = $view.offsetHeight*f;
+
+			gl.uniform2f(Shader.iResolution, $canvas.width, $canvas.height);
+			gl.viewport(0, 0, $canvas.width, $canvas.height);
+			
+			Shader.paused && Shader.snapshot();
 		}
 	};
 
